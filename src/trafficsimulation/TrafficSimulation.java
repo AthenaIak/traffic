@@ -15,7 +15,15 @@ public class TrafficSimulation {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        p("test");
+    }
+    
+    /**
+     * 
+     * @param s String to be printed.
+     */
+    private static void p(String s){
+        System.out.println(s);
     }
     
 }
