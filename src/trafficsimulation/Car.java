@@ -63,6 +63,14 @@ public abstract class Car {
         }
     }
 
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
     public void setLane(int lane) {
         this.lane = lane;
     }
