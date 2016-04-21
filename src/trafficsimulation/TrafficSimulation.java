@@ -1,21 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package trafficsimulation;
 
-/**
- *
- * @author Athena
- */
+import java.util.ArrayList;
+
 public class TrafficSimulation {
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        p("test");
+        // simple example of use
+        ArrayList<Car> cars = new ArrayList<>();
+        cars.add(new FastCar(1,5,1,1));
+        cars.add(new NormalCar(2,3,2,8));
+        
+        for(Car car : cars)
+            p(""+car.getMaximumAcceleration());
     }
     
     /**
