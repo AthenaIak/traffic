@@ -102,4 +102,50 @@ public abstract class Car {
     public int getMaximumSpeed() {
         return maximumSpeed;
     }
+
+    /**
+     * This method adjusts the speed of the current car,
+     * depending of the distance to and the speed of the car in front.
+     *
+     * @param distance_to_next : distance to car in front.
+     * @param speed_of_next : speed in car in front.
+     */
+    public int adaptSpeed(int distance_to_next, int speed_of_next) {
+        //We need to decelerate
+        if (speed_of_next < speed) {
+            //In this timestep there is enough room, but we may only assume ther isn't in the next.
+            //If the speed difference is too big, we need to start decelerating now.
+            if (distance_to_next == speed && (speed - speed_of_next) > maximumDeceleration) {
+                speed -= Math.min(maximumDeceleration, speed - speed_of_next - maximumDeceleration);
+            }
+            //There is already too little room now, so we need to decelerate.
+            else if (distance_to_next < speed) {
+                speed -= Math.min(maximumDeceleration, speed - speed_of_next);
+            }
+        }
+        //The car in front is driving faster than this car.
+        else if (speed_of_next > speed) {
+            //The distance to the next car is within the limit, but it will expand.
+            //If it expands enough, we may accelerate.
+            if (speed <= distance_to_next) {
+                speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, (distance_to_next + (speed_of_next - speed)) - speed));
+            }
+            // The distance to the next car is greater than our speed; we may accelerate
+            else {
+                //The car may only accelerate if the gap created by the speed difference is at least as big as the speed.
+                if (speed_of_next - speed + distance_to_next > speed) {
+                    speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, speed_of_next - speed_of_next + distance_to_next));
+                }
+            }
+        } else {
+            //speed of two cars is equal. Only if the distance between the both is large enough, the car may accelerate.
+            if (speed < distance_to_next) {
+                //the car is allowed to accelerate if it is not driving at maximum speed already.
+                //the maximum amount of acceleration is determined both by the physical limits of the car and the
+                //distance to the car ahead.
+                speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, distance_to_next - speed));
+            }
+        }
+        return speed;
+    }
 }
