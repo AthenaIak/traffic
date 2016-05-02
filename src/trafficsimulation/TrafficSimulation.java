@@ -3,8 +3,8 @@ package trafficsimulation;
 import java.util.ArrayList;
 
 public class TrafficSimulation {
-    public static final int ROAD_SIZE = 100;
-    public static final int NUMBER_OF_NORMAL_CARS = 8;
+    public static final int ROAD_SIZE = 150;
+    public static final int NUMBER_OF_NORMAL_CARS = 20;
     public static final int NUMBER_OF_FAST_CARS = 5;
 
     /**
@@ -13,7 +13,7 @@ public class TrafficSimulation {
     public static void main(String[] args) {
         Road road = new Road();
         road.printTrafficSituation();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 30; i++) {
             road.nextState();
             road.printTrafficSituation();
         }

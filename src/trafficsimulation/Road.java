@@ -34,7 +34,7 @@ public class Road {
             cars.add(tmpC);
             if (tmpC.getLane() == 1) l1[dummyPosition] = tmpC.getSpeed();
             else l2[dummyPosition] = tmpC.getSpeed();
-            dummyPosition += Math.floorMod(tmpC.getSpeed() + 4,TrafficSimulation.ROAD_SIZE);
+            dummyPosition = Math.floorMod(dummyPosition + tmpC.getSpeed() + 4,TrafficSimulation.ROAD_SIZE);
         }
 
     }
@@ -117,7 +117,7 @@ public class Road {
     public void printTrafficSituation() {
         String traffic = "";
         String positions = "";
-        for (int i = 0; i < TrafficSimulation.ROAD_SIZE; i++) {
+        for (int i = 0; i < l1.length; i++) {
             if (l1[i] == 0) {
                 traffic += "_";
             } else {
