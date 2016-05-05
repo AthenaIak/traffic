@@ -35,3 +35,12 @@ public class TrafficSimulation {
     }
 
 }
+
+
+/*
+
+ +  Try to find some references to models, so you can compare how realistic this model is.
+ +  Study oncoming and exiting ramp.
+ +  Implement some sort of  " sleepy drivers" who do not use the speed of the car in front, but
+    only the distance to the car in front.
+ */
