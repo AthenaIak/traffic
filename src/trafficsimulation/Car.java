@@ -117,19 +117,19 @@ public abstract class Car {
             //If the speed difference is too big, we need to start decelerating now.
             if (distance_to_next == speed && (speed - speed_of_next) > maximumDeceleration) {
                 speed -= Math.min(maximumDeceleration, speed - speed_of_next - maximumDeceleration);
-            }
-            //There is already too little room now, so we need to decelerate.
+            } //There is already too little room now, so we need to decelerate.
             else if (distance_to_next < speed) {
                 speed -= Math.min(maximumDeceleration, speed - speed_of_next);
             }
-        }
-        //The car in front is driving faster than this car.
+        } 
+
+        // The car in front is driving faster than this car.
         else if (speed_of_next > speed) {
             //The distance to the next car is within the limit, but it will expand.
             //If it expands enough, we may accelerate.
             if (speed <= distance_to_next) {
                 speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, (distance_to_next + (speed_of_next - speed)) - speed));
-            }
+            } 
             // The distance to the next car is greater than our speed; we may accelerate
             else {
                 //The car may only accelerate if the gap created by the speed difference is at least as big as the speed.
