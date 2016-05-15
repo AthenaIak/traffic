@@ -5,7 +5,7 @@ public class TrafficSimulation {
 
     public static final int ROAD_SIZE = 150;
     public static final int NUMBER_OF_NORMAL_CARS = 20;
-    public static final int NUMBER_OF_FAST_CARS = 5;
+    public static final int NUMBER_OF_FAST_CARS = 15;
 
     /**
      * @param args the command line arguments
