@@ -1,5 +1,7 @@
 package trafficsimulation;
 
+import java.awt.Color;
+
 /*
  speed: 
  cells/t   m/s km/h
@@ -29,6 +31,7 @@ public abstract class Car {
     protected int maximumSpeed;
     protected int maximumAcceleration;
     protected int maximumDeceleration;
+    protected Color color;
 
     public Car(int ID, int speed, int lane, int position) {
         this.ID = ID;
@@ -101,6 +104,10 @@ public abstract class Car {
 
     public int getMaximumSpeed() {
         return maximumSpeed;
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     /**

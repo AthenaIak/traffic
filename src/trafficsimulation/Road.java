@@ -159,4 +159,10 @@ public class Road {
         traffic_l2 += "|";
         System.out.println(traffic_l1 + "\n" + traffic_l2 + "\n");
     }
+
+    public ArrayList<Car> getCars() {
+        return cars;
+    }
+    
+    
 }

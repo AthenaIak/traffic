@@ -1,16 +1,15 @@
 package trafficsimulation;
 
-
 public class TrafficSimulation {
 
-    public static final int ROAD_SIZE = 150;
-    public static final int NUMBER_OF_NORMAL_CARS = 20;
-    public static final int NUMBER_OF_FAST_CARS = 15;
+    public static final int ROAD_SIZE = 40;
+    public static final int NUMBER_OF_NORMAL_CARS = 15;
+    public static final int NUMBER_OF_FAST_CARS = 10;
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) {        
         Road road = new Road();
         road.printTrafficSituation();
         for (int i = 0; i < 30; i++) {
