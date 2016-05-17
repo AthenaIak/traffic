@@ -7,9 +7,9 @@ public class FastCar extends Car {
 
     public FastCar(int ID, int speed, int lane, int position) {
         super(ID, speed, lane, position);
-        maximumSpeed = 11;
-        maximumAcceleration = 5;
-        maximumDeceleration = 5;
+        maximumSpeed = 6;
+        maximumAcceleration = 2;
+        maximumDeceleration = 2;
 
         Random r = new Random();
         color = new Color(255, r.nextInt(130), r.nextInt(130));

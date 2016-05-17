@@ -33,6 +33,7 @@ public abstract class Car {
     protected int maximumDeceleration;
     protected Color color;
 
+
     public Car(int ID, int speed, int lane, int position) {
         this.ID = ID;
         this.speed = speed;
@@ -59,11 +60,7 @@ public abstract class Car {
     }
 
     public void switchLane() {
-        if (lane == 1) {
-            this.lane = 2;
-        } else {
-            this.lane = 1;
-        }
+        lane = Math.floorMod(2*lane,3);
     }
 
     public int getPosition() {
@@ -110,6 +107,8 @@ public abstract class Car {
         return color;
     }
 
+
+
     /**
      * This method adjusts the speed of the current car,
      * depending of the distance to and the speed of the car in front.
@@ -155,4 +154,6 @@ public abstract class Car {
         }
         return speed;
     }
+
+
 }

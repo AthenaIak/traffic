@@ -40,7 +40,6 @@ public class SleepyCar extends Car {
         else {
             speed += Math.min(maximumAcceleration, Math.min(distance_to_next - speed, maximumSpeed - speed));
         }
-
         return speed;
     }
 }

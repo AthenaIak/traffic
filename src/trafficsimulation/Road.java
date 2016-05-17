@@ -28,7 +28,7 @@ public class Road {
         }
 
         // randomly generate a car depending on rules (to avoid collisions)
-        int l1_dummyPosition = 0, l2_dummyPosition = 0, dummyPosition;
+        int l1_dummyPosition = 0, l2_dummyPosition = 0, dummyPosition = 0;
         Car tmpC;
         Random r = new Random();
         int normal_generated = 0, fast_generated = 0;
@@ -65,7 +65,9 @@ public class Road {
             if (lane == 1) l1_dummyPosition = dummyPosition;
             else l2_dummyPosition = dummyPosition;
         }
-
+        tmpC = new BrokenCar(TrafficSimulation.NUMBER_OF_FAST_CARS + TrafficSimulation.NUMBER_OF_NORMAL_CARS, r.nextInt(9) + 1, 1, dummyPosition, 0.3);
+        cars.add(tmpC);
+        l1[dummyPosition] = tmpC.getSpeed();
     }
 
     public void nextState() {
@@ -162,7 +164,7 @@ public class Road {
 
     private char toHex(int input) {
         if (input <= 9 && input >= 0) {
-            return (char)input;
+            return Character.forDigit(input,10);
         } else {
             switch (input) {
                 case 10:

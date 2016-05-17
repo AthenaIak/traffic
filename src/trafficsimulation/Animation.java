@@ -8,7 +8,7 @@ public class Animation extends Applet implements Runnable {
 
     public Thread t;
     private final Road road = new Road();
-    private static final int cooldown = 500; //cooldown between steps of the simulation
+    private static final int cooldown = 1000; //cooldown between steps of the simulation
 
     @Override
     public void start() {
