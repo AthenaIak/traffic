@@ -15,6 +15,7 @@ package trafficsimulation;
 - calculate desired position:
     new desired position = prev_pos + speed + max_acc
     then loop through: speed + max_acc to speed - max_dec:
+        TODO: Check whether there are no cars inbetween the closest desired position and the current position. If that is the case, then we have a collision.
         possible = ((next_car_pos + next_car_speed - max_dec) - (gap - desired_pos + speed + max_acc)) >= 0
             where gap = (floor((new_speed+max_acc) / max_dec + 1)
                 where new_speed = desired_position - position
