@@ -142,7 +142,7 @@ public class Road {
             if (l1[i] == -1) {
                 traffic_l1 += "_";
             } else {
-                traffic_l1 += l1[i];
+                traffic_l1 += toHex(l1[i]);
             }
         }
 
@@ -153,11 +153,34 @@ public class Road {
             if (l2[i] == -1) {
                 traffic_l2 += "_";
             } else {
-                traffic_l2 += l2[i];
+                traffic_l2 += toHex(l2[i]);
             }
         }
         traffic_l2 += "|";
         System.out.println(traffic_l1 + "\n" + traffic_l2 + "\n");
+    }
+
+    private char toHex(int input) {
+        if (input <= 9 && input >= 0) {
+            return (char)input;
+        } else {
+            switch (input) {
+                case 10:
+                    return 'A';
+                case 11:
+                    return 'B';
+                case 12:
+                    return 'C';
+
+                case 13:
+                    return 'D';
+                case 14:
+                    return 'E';
+
+                default:
+                    return 'F';
+            }
+        }
     }
 
     public ArrayList<Car> getCars() {
