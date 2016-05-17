@@ -31,10 +31,12 @@ public class Animation extends Applet implements Runnable {
 
         while (t == t1) {
             road.nextState();
+            road.printTrafficSituation();
             repaint();
             try {
                 Thread.sleep(cooldown);
             } catch (Exception e) {
+                System.out.println(e.toString());
             }
         }
     }
