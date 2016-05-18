@@ -17,11 +17,18 @@ public class FastCar extends Car {
 
     public FastCar(int ID, int lane, int position) {
         super(ID, lane, position);
-        maximumSpeed = TrafficSimulation.MAXIMUM_SPEED_OF_FAST_CARS;
+
+        Random r = new Random();
+
+        // make max_speed of car not always the same
+        if (r.nextFloat()<0.5){
+            maximumSpeed = TrafficSimulation.MAXIMUM_SPEED_BY_LAW_OF_FAST_CARS - 1;
+        }else{
+            maximumSpeed = TrafficSimulation.MAXIMUM_SPEED_BY_LAW_OF_FAST_CARS + r.nextInt(1);
+        }   
         maximumAcceleration = 2;
         maximumDeceleration = 2;
 
-        Random r = new Random();
         color = new Color(255, r.nextInt(130), r.nextInt(130));
         speed = maximumSpeed - r.nextInt(1);    // around the max speed at beginning
     }

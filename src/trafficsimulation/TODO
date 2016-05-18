@@ -36,7 +36,9 @@ Generate the initial traffic situation. - Hue
 Initial speed of car is generated in the construction of FastCar() or NormalCar() around the maximum speed 
 (assume everything is normal, so cars are at around max speed).
 
-Distance between a car and the car in the front (same lane) is between [carSpeed, 2*carSpeed)
+Car may have its own max_speed which is around +/- 1 of the max_speed by law.
+
+Distance between a car and the car in the front (same lane) is between [1.5 x carSpeed, 2*carSpeed)
 so we simulate the fact that some cars follow the 2-seconds rule, some not
 
 The road size (length of lane) is therefore adapted to be: num_cars X (max_speed X 2 cell_gaps) / (2 lanes)

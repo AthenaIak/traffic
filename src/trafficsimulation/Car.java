@@ -16,6 +16,8 @@ import java.awt.Color;
  9           27  97,2
  10          30  108
  11          33  118,8
+ 12          36  129.6
+ 13          39  140.4
 
  Note: If a moment t lasts 1 second, then a cell represents 3 meters 
  (which is also proximately the legth of a car).
@@ -129,7 +131,7 @@ public abstract class Car {
         if (speed_of_next < speed) {
             //In this timestep there is enough room, but we may only assume ther isn't in the next.
             //If the speed difference is too big, we need to start decelerating now.
-            System.out.println("Car " + ID + ": Current speed " + speed + ", speed of next " + speed_of_next + ", distance to next " + distance_to_next + "\n");
+            System.out.println("Car " + ID + " at lane " + lane + ": Current speed " + speed + ", speed of next " + speed_of_next + ", distance to next " + distance_to_next + "\n");
             if (distance_to_next == speed && (speed - speed_of_next) > maximumDeceleration) {
                 speed -= Math.min(maximumDeceleration, speed - speed_of_next - maximumDeceleration);
             } //There is already too little room now, so we need to decelerate.

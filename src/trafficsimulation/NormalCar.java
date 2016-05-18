@@ -19,11 +19,17 @@ public class NormalCar extends Car{
     public NormalCar(int ID, int lane, int position) {
         super(ID, lane, position);
 
-        maximumSpeed = TrafficSimulation.MAXIMUM_SPEED_OF_NORMAL_CARS;
+        Random r = new Random();
+        
+        // make max_speed of car not always the same
+        if (r.nextFloat()<0.5){
+            maximumSpeed = TrafficSimulation.MAXIMUM_SPEED_BY_LAW_OF_NORMAL_CARS - 1;
+        }else{
+            maximumSpeed = TrafficSimulation.MAXIMUM_SPEED_BY_LAW_OF_NORMAL_CARS + r.nextInt(1);
+        }
         maximumAcceleration = 1;
         maximumDeceleration = 2;
         
-        Random r = new Random();
         color = new Color(r.nextInt(130), r.nextInt(130), 255);
         speed = maximumSpeed - r.nextInt(1);    // around the max speed at beginning
     }
