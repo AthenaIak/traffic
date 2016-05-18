@@ -2,6 +2,7 @@ package trafficsimulation;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Arrays;
 
 public class Road {
 
@@ -46,12 +47,12 @@ public class Road {
                 type_of_car = 1;
             else type_of_car = r.nextInt(2) + 1;
 
-            // randomly choose a speed and create car
+            // create car
             if (type_of_car == 1) { // normal car to be generated
-                tmpC = new NormalCar(i, r.nextInt(9) + 1, lane, dummyPosition);
+                tmpC = new NormalCar(i, lane, dummyPosition);
                 normal_generated++;
             } else { // fast car to be generated
-                tmpC = new FastCar(i, r.nextInt(11) + 1, lane, dummyPosition);
+                tmpC = new FastCar(i, lane, dummyPosition);
                 fast_generated++;
             }
             cars.add(tmpC);
@@ -61,13 +62,16 @@ public class Road {
             else l2[dummyPosition] = tmpC.getSpeed();
 
             // save the dummy position for the next generated cars
-            dummyPosition = Math.floorMod(dummyPosition + tmpC.getSpeed() + 4, TrafficSimulation.ROAD_SIZE);
+            // distance to next car is between [carSpeed, 2*carSpeed)
+            dummyPosition = Math.floorMod(dummyPosition + tmpC.getSpeed() + r.nextInt(tmpC.getSpeed()), TrafficSimulation.ROAD_SIZE);
             if (lane == 1) l1_dummyPosition = dummyPosition;
             else l2_dummyPosition = dummyPosition;
         }
         tmpC = new BrokenCar(TrafficSimulation.NUMBER_OF_FAST_CARS + TrafficSimulation.NUMBER_OF_NORMAL_CARS, r.nextInt(9) + 1, 1, dummyPosition, 0.3);
         cars.add(tmpC);
         l1[dummyPosition] = tmpC.getSpeed();
+        System.out.println("Lane 1\n" + Arrays.toString(l1) + "\n");
+        System.out.println("Lane 2\n" + Arrays.toString(l2) + "\n");
     }
 
     public void nextState() {

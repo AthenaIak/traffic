@@ -41,7 +41,7 @@ public class Animation extends Applet implements Runnable {
         }
     }
 
-    int carWidth = 30, carHeight = 10;
+    int carWidth = 10, carHeight = 10;
 
     @Override
     public void paint(Graphics g) {

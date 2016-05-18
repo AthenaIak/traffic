@@ -43,6 +43,14 @@ public abstract class Car {
         this.rightBlinker = false;
     }
 
+    public Car(int ID, int lane, int position) {
+        this.ID = ID;
+        this.lane = lane;
+        this.position = position;
+        this.leftBlinker = false;
+        this.rightBlinker = false;
+    }
+    
     public int getID() {
         return ID;
     }
@@ -121,12 +129,14 @@ public abstract class Car {
         if (speed_of_next < speed) {
             //In this timestep there is enough room, but we may only assume ther isn't in the next.
             //If the speed difference is too big, we need to start decelerating now.
+            System.out.println("Car " + ID + ": Current speed " + speed + ", speed of next " + speed_of_next + ", distance to next " + distance_to_next + "\n");
             if (distance_to_next == speed && (speed - speed_of_next) > maximumDeceleration) {
                 speed -= Math.min(maximumDeceleration, speed - speed_of_next - maximumDeceleration);
             } //There is already too little room now, so we need to decelerate.
             else if (distance_to_next < speed) {
                 speed -= Math.min(maximumDeceleration, speed - speed_of_next);
             }
+            System.out.println("Adjusted speed " + speed + "\n");
         } 
 
         // The car in front is driving faster than this car.
