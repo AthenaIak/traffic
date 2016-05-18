@@ -1,0 +1,31 @@
+package trafficsimulation;
+
+/**
+ * Created by oschnitzeler on 5/17/16.
+ *
+ * TODO: Change order of adapting speed <-> setting new position in Road.java
+ * TODO: Incorporate gap in calculation of new desired speed
+ * TODO: Implement iterative way of finding new speed for next time step. (desired position)
+ * TODO: Compare rules from the article by Vasic et al. to our set
+ * TODO: Find proper way to generate the initial traffic situation.
+ *
+ */
+
+
+- calculate desired position:
+    new desired position = prev_pos + speed + max_acc
+    then loop through: speed + max_acc to speed - max_dec:
+        TODO: Check whether there are no cars in between the closest desired position and the current position. If that is the case, then we have a collision.
+        possible = ((next_car_pos + next_car_speed - max_dec) - (gap - desired_pos + speed + max_acc)) >= 0
+            where gap = (floor((new_speed+max_acc) / max_dec + 1)
+                where new_speed = desired_position - position
+        if possible:
+            return desired_pos
+        else:
+            check different lane at same position - incorporate position/speed of previous car on other lane:
+                possible = prev_car_position + speed + max_acc + gap - position <= 0 (?)
+
+    return impossible (?)
+
+- calculate and update speed, lane, position based on desired position
+
