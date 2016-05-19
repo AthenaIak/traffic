@@ -8,7 +8,7 @@ package trafficsimulation;
  * TODO: Implement iterative way of finding new speed for next time step. (desired position) - Athena 
  * TODO: Compare rules from the article by Vasic et al. to our set
  * TODO: Find proper way to generate the initial traffic situation.  - Hue - DONE, see commits in my branch
- * TODO: Make the loop to move car in Road.nextState() become randomly moving, not sequential as current, so the car which is moved first will have priority in choosing new position on road
+ * TODO: Make the loop to move car in Road.nextState() become randomly moving, not sequential as current, so the car which is moved first will have priority in choosing new position on road - Hue's suggestion. Athena: I disagree; we should make it work parallel.
  */
 
 

@@ -48,10 +48,10 @@ public class Road {
 
             // randomly choose a speed and create car
             if (type_of_car == 1) { // normal car to be generated
-                tmpC = new NormalCar(i, r.nextInt(9) + 1, lane, dummyPosition);
+                tmpC = new NormalCar(i, r.nextInt(TrafficSimulation.MAX_NORMAL_CAR_SPEED) + 1, lane, dummyPosition);
                 normal_generated++;
             } else { // fast car to be generated
-                tmpC = new FastCar(i, r.nextInt(11) + 1, lane, dummyPosition);
+                tmpC = new FastCar(i, r.nextInt(TrafficSimulation.MAX_FAST_CAR_SPEED) + 1, lane, dummyPosition);
                 fast_generated++;
             }
             cars.add(tmpC);
@@ -61,13 +61,14 @@ public class Road {
             else l2[dummyPosition] = tmpC.getSpeed();
 
             // save the dummy position for the next generated cars
-            dummyPosition = Math.floorMod(dummyPosition + tmpC.getSpeed() + 4, TrafficSimulation.ROAD_SIZE);
+            dummyPosition = Math.floorMod(dummyPosition + Math.floorDiv(tmpC.getSpeed(), tmpC.getMaximumAcceleration()) + 2, TrafficSimulation.ROAD_SIZE);
+
             if (lane == 1) l1_dummyPosition = dummyPosition;
             else l2_dummyPosition = dummyPosition;
         }
-        tmpC = new BrokenCar(TrafficSimulation.NUMBER_OF_FAST_CARS + TrafficSimulation.NUMBER_OF_NORMAL_CARS, r.nextInt(9) + 1, 1, dummyPosition, 0.3);
-        cars.add(tmpC);
-        l1[dummyPosition] = tmpC.getSpeed();
+//        tmpC = new BrokenCar(TrafficSimulation.NUMBER_OF_FAST_CARS + TrafficSimulation.NUMBER_OF_NORMAL_CARS, r.nextInt(9) + 1, 1, dummyPosition, 0.3);
+//        cars.add(tmpC);
+//        l1[dummyPosition] = tmpC.getSpeed();
     }
 
     public void nextState() {
@@ -81,9 +82,12 @@ public class Road {
         // move cars (check rules on current road and save new positions in next road)
         for (Car car : cars) {
 //            moveCar(car);
-            if(!car.move(l1,l2)) System.out.println("Car didn't move!");
-            else{
-                helperL1[car.getPosition()] = car.getSpeed();
+            if (!car.move(l1, l2)) {
+                System.out.println("Car didn't move! \n" + car);
+            } else {
+                if (car.getLane() == 1)
+                    helperL1[car.getPosition()] = car.getSpeed();
+                else helperL2[car.getPosition()] = car.getSpeed();
             }
         }
 
@@ -168,7 +172,7 @@ public class Road {
 
     private char toHex(int input) {
         if (input <= 9 && input >= 0) {
-            return Character.forDigit(input,10);
+            return Character.forDigit(input, 10);
         } else {
             switch (input) {
                 case 10:
@@ -192,6 +196,5 @@ public class Road {
     public ArrayList<Car> getCars() {
         return cars;
     }
-    
-    
+
 }

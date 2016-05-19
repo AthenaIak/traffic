@@ -28,6 +28,7 @@ public class Animation extends Applet implements Runnable {
     @Override
     public void run() {
         Thread t1 = Thread.currentThread();
+        road.printTrafficSituation();
 
         while (t == t1) {
             road.nextState();

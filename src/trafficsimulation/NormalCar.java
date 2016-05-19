@@ -8,12 +8,12 @@ public class NormalCar extends Car{
     public NormalCar(int ID, int speed, int lane, int position) {
         super(ID, speed, lane, position);
 
-        maximumSpeed = 3;
+        maximumSpeed = TrafficSimulation.MAX_NORMAL_CAR_SPEED;
         maximumAcceleration = 1;
         maximumDeceleration = 1;
         
         Random r = new Random();
-        color = new Color(r.nextInt(130), r.nextInt(130), 255);
+        color = new Color(0, r.nextInt(130), 255);
     }
     
 }

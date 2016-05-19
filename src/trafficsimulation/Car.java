@@ -33,7 +33,6 @@ public abstract class Car {
     protected int maximumDeceleration;
     protected Color color;
 
-
     public Car(int ID, int speed, int lane, int position) {
         this.ID = ID;
         this.speed = speed;
@@ -60,7 +59,7 @@ public abstract class Car {
     }
 
     public void switchLane() {
-        lane = Math.floorMod(2*lane,3);
+        lane = Math.floorMod(2 * lane, 3);
     }
 
     public int getPosition() {
@@ -106,16 +105,99 @@ public abstract class Car {
     public Color getColor() {
         return color;
     }
-    
+
     /**
-     * 
-     * @return true if a move was possible
+     *
+     * @param l1 Current state of lane 1
+     * @param l2 Current state of lane 2
+     * @return true if the car moved (a move was possible)
      */
-    public boolean move(int[] l1, int[] l2){
+    public boolean move(int[] l1, int[] l2) {
+        int desiredPosition = speed + maximumAcceleration < maximumSpeed ? position + speed + maximumAcceleration : position + maximumSpeed;
+        int minimumPosition = speed - maximumDeceleration > 0 ? position + speed - maximumDeceleration : position;
+
+        System.out.println("(" + lane + "," + position + "," + speed + ") " + desiredPosition + " " + minimumPosition);
+
+        // retrive neighborhood info (position and speed of the 3 important neighbors)
+        int nextCarSameLpos = getPositionOfNextCar(lane == 1 ? l1 : l2, position);
+        int nextCarDiffLpos = getPositionOfNextCar(lane == 1 ? l2 : l1, position);
+        int prevCarDiffLpos = getPositionOfPrevCar(lane == 1 ? l2 : l1, position);
+
+        if (nextCarDiffLpos != -1) {
+            int nextCarDiffLspeed = lane == 1 ? l2[nextCarDiffLpos] : l1[nextCarDiffLpos];
+        }
+        if (prevCarDiffLpos != -1) {
+            int prevCarDiffLspeed = lane == 1 ? l2[prevCarDiffLpos] : l1[prevCarDiffLpos];
+        }
+
+        int nextCarSameLspeed, futureNextCarPos, distance, nextSpeed, minFutureGap, worstCaseGap;
+        // iterate through all possible positions (starting from the most desired)
+        for (int nextPosition = desiredPosition; nextPosition >= minimumPosition; nextPosition--) { //nextPosition is not rounded to road size yet
+            nextSpeed = nextPosition - position;
+
+            // check if this position is possible for the current lane
+            if (nextCarSameLpos == -1) { // there is no other car on the lane, so moving is possible
+                position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE);
+                speed = nextSpeed;
+                // lane = lane;
+                return true;
+            }
+
+            nextCarSameLspeed = lane == 1 ? l1[nextCarSameLpos] : l2[nextCarSameLpos];
+            futureNextCarPos = nextCarSameLpos + nextCarSameLspeed - TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION; // worst case senario
+            minFutureGap = Math.floorDiv(nextSpeed, maximumDeceleration) + 1; // minimum gap so that no crashes (maximumDeceleration of the current car)
+
+            if (nextCarSameLpos < position) //comes full circle
+                worstCaseGap = futureNextCarPos + TrafficSimulation.ROAD_SIZE - nextPosition;
+            else
+                worstCaseGap = futureNextCarPos - nextPosition;
+            if (worstCaseGap >= minFutureGap) { // then moving there is possible
+                position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE);
+                speed = nextSpeed;
+                // lane = lane;
+                return true;
+            }
+            // TODO: examine for different lane
+        }
+
         return false;
     }
+//- calculate desired position:
+//    new desired position = prev_pos + speed + max_acc
+//    then loop through: speed + max_acc to speed - max_dec:
+//        TODO: Check whether there are no cars in between the closest desired position and the current position. If that is the case, then we have a collision.
+//        possible = ((next_car_pos + next_car_speed - max_dec) - (gap - desired_pos + speed + max_acc)) >= 0
+//            where gap = (floor((new_speed+max_acc) / max_dec) + 1)
+//                where new_speed = desired_position - position
+//        if possible:
+//            return desired_pos
+//        else:
+//            check different lane at same position - incorporate position/speed of previous car on other lane:
+//                possible = prev_car_position + speed + max_acc + gap - position <= 0 (?)
+//
+//    return impossible (?)
+//
+//- calculate and update speed, lane, position based on desired position
 
+    private int getPositionOfNextCar(int[] lane, int current_pos) {
+        for (int i = current_pos + 1; i < TrafficSimulation.ROAD_SIZE + current_pos; i++) {
+            int correct_i = Math.floorMod(i, TrafficSimulation.ROAD_SIZE);
+            if (lane[correct_i] != -1) {
+                return correct_i;
+            }
+        }
+        return -1;
+    }
 
+    private int getPositionOfPrevCar(int[] lane, int current_pos) {
+        for (int i = current_pos + TrafficSimulation.ROAD_SIZE; i > current_pos; i--) {
+            int correct_i = Math.floorMod(i, TrafficSimulation.ROAD_SIZE);
+            if (lane[correct_i] != -1) {
+                return correct_i;
+            }
+        }
+        return -1;
+    }
 
     /**
      * This method adjusts the speed of the current car,
@@ -135,16 +217,13 @@ public abstract class Car {
             else if (distance_to_next < speed) {
                 speed -= Math.min(maximumDeceleration, speed - speed_of_next);
             }
-        } 
-
-        // The car in front is driving faster than this car.
+        } // The car in front is driving faster than this car.
         else if (speed_of_next > speed) {
             //The distance to the next car is within the limit, but it will expand.
             //If it expands enough, we may accelerate.
             if (speed <= distance_to_next) {
                 speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, (distance_to_next + (speed_of_next - speed)) - speed));
-            } 
-            // The distance to the next car is greater than our speed; we may accelerate
+            } // The distance to the next car is greater than our speed; we may accelerate
             else {
                 //The car may only accelerate if the gap created by the speed difference is at least as big as the speed.
                 if (speed_of_next - speed + distance_to_next > speed) {
@@ -163,5 +242,19 @@ public abstract class Car {
         return speed;
     }
 
+    @Override
+    public String toString() {
+        String str;
+        if (this.getClass().toString().equals("class trafficsimulation.NormalCar"))
+            str = "N ";
+        else if (this.getClass().toString().equals("class trafficsimulation.FastCar"))
+            str = "F ";
+        else
+            str = "E ";
 
+        return "(" + str + lane + "," + position + "," + speed + ") ";
+    }
+
+//                g.setColor(Color.blue);
+//            else if (c.getClass().toString().equals("class trafficsimulation.FastCar"))
 }
