@@ -107,77 +107,97 @@ public abstract class Car {
     }
 
     /**
-     *
+     * This method figures out the next move for the car (and performs the move).
      * @param l1 Current state of lane 1
      * @param l2 Current state of lane 2
-     * @return true if the car moved (a move was possible)
+     * @return true if a move was possible for the car.
      */
     public boolean move(int[] l1, int[] l2) {
         int desiredPosition = speed + maximumAcceleration < maximumSpeed ? position + speed + maximumAcceleration : position + maximumSpeed;
         int minimumPosition = speed - maximumDeceleration > 0 ? position + speed - maximumDeceleration : position;
 
-        System.out.println("(" + lane + "," + position + "," + speed + ") " + desiredPosition + " " + minimumPosition);
-
-        // retrive neighborhood info (position and speed of the 3 important neighbors)
+        // retrieve neighborhood info (position and speed of the 3 important neighbors)
         int nextCarSameLpos = getPositionOfNextCar(lane == 1 ? l1 : l2, position);
         int nextCarDiffLpos = getPositionOfNextCar(lane == 1 ? l2 : l1, position);
         int prevCarDiffLpos = getPositionOfPrevCar(lane == 1 ? l2 : l1, position);
-
-        if (nextCarDiffLpos != -1) {
-            int nextCarDiffLspeed = lane == 1 ? l2[nextCarDiffLpos] : l1[nextCarDiffLpos];
-        }
         if (prevCarDiffLpos != -1) {
             int prevCarDiffLspeed = lane == 1 ? l2[prevCarDiffLpos] : l1[prevCarDiffLpos];
         }
 
-        int nextCarSameLspeed, futureNextCarPos, distance, nextSpeed, minFutureGap, worstCaseGap;
+        int nextCarSameLspeed, nextCarDiffLspeed, nextSpeed;
+
         // iterate through all possible positions (starting from the most desired)
         for (int nextPosition = desiredPosition; nextPosition >= minimumPosition; nextPosition--) { //nextPosition is not rounded to road size yet
             nextSpeed = nextPosition - position;
 
             // check if this position is possible for the current lane
-            if (nextCarSameLpos == -1) { // there is no other car on the lane, so moving is possible
-                position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE);
+            nextCarSameLspeed = nextCarSameLpos == -1 ? -1 : lane == 1 ? l1[nextCarSameLpos] : l2[nextCarSameLpos];
+            if (nextCarIsFarEnough(nextPosition, nextSpeed, nextCarSameLpos, nextCarSameLspeed)) {
+                position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE); // nextPosition is now rounded to road size
                 speed = nextSpeed;
                 // lane = lane;
                 return true;
             }
 
-            nextCarSameLspeed = lane == 1 ? l1[nextCarSameLpos] : l2[nextCarSameLpos];
-            futureNextCarPos = nextCarSameLpos + nextCarSameLspeed - TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION; // worst case senario
-            minFutureGap = Math.floorDiv(nextSpeed, maximumDeceleration) + 1; // minimum gap so that no crashes (maximumDeceleration of the current car)
-
-            if (nextCarSameLpos < position) //comes full circle
-                worstCaseGap = futureNextCarPos + TrafficSimulation.ROAD_SIZE - nextPosition;
-            else
-                worstCaseGap = futureNextCarPos - nextPosition;
-            if (worstCaseGap >= minFutureGap) { // then moving there is possible
-                position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE);
-                speed = nextSpeed;
-                // lane = lane;
-                return true;
+            // check if this position is possible for the other lane
+            int prevCarDiffLspeed = prevCarDiffLpos == -1 ? -1 : lane == 1 ? l2[prevCarDiffLpos] : l1[prevCarDiffLpos];
+            if (prevCarIsFarEnough(nextPosition, prevCarDiffLpos, prevCarDiffLspeed)) { // then check if next car (diff lane) is far enough
+                nextCarDiffLspeed = nextCarDiffLpos == -1 ? -1 : lane == 1 ? l2[nextCarDiffLpos] : l1[nextCarDiffLpos];
+                if (nextCarIsFarEnough(nextPosition, nextSpeed, nextCarDiffLpos, nextCarDiffLspeed)) {
+                    position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE);
+                    speed = nextSpeed;
+                    lane = lane == 1 ? 2 : 1; // switch lane
+                    return true;
+                }
             }
-            // TODO: examine for different lane
         }
 
         return false;
     }
-//- calculate desired position:
-//    new desired position = prev_pos + speed + max_acc
-//    then loop through: speed + max_acc to speed - max_dec:
-//        TODO: Check whether there are no cars in between the closest desired position and the current position. If that is the case, then we have a collision.
-//        possible = ((next_car_pos + next_car_speed - max_dec) - (gap - desired_pos + speed + max_acc)) >= 0
-//            where gap = (floor((new_speed+max_acc) / max_dec) + 1)
-//                where new_speed = desired_position - position
-//        if possible:
-//            return desired_pos
-//        else:
-//            check different lane at same position - incorporate position/speed of previous car on other lane:
-//                possible = prev_car_position + speed + max_acc + gap - position <= 0 (?)
-//
-//    return impossible (?)
-//
-//- calculate and update speed, lane, position based on desired position
+
+    private boolean prevCarIsFarEnough(int nextPosition, int prevCarPos, int prevCarSpeed) {
+        if (prevCarPos == -1) return true;
+
+        int worstCaseGap;
+        int minFutureGap = Math.floorDiv(prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION, TrafficSimulation.GLOBAL_MINIMUM_DECELERATION) + 1;
+
+        if (prevCarPos > position) //comes full circle
+            worstCaseGap = nextPosition - (prevCarPos + prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION - TrafficSimulation.ROAD_SIZE);
+        else
+            worstCaseGap = nextPosition - (prevCarPos + prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION);
+
+        // check if the worst possible gap is at least as big as the minimum allowed gap
+        if (worstCaseGap >= minFutureGap)
+            return true;
+
+        return false;
+    }
+
+    private boolean nextCarIsFarEnough(int nextPosition, int nextSpeed, int nextCarPos, int nextCarSpeed) {
+
+        if (nextCarPos == -1) { // there is no other car on the lane, so moving is possible
+            position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE);
+            speed = nextSpeed;
+            // lane = lane;
+            return true;
+        }
+
+        int futureNextCarPos, minFutureGap, worstCaseGap;
+        futureNextCarPos = nextCarPos + nextCarSpeed - TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION; // worst case senario
+        minFutureGap = Math.floorDiv(nextSpeed, maximumDeceleration) + 1; // minimum gap so that no crashes occur (maximumDeceleration of the current car)
+
+        if (nextCarPos < position) //comes full circle
+            worstCaseGap = futureNextCarPos + TrafficSimulation.ROAD_SIZE - nextPosition;
+        else
+            worstCaseGap = futureNextCarPos - nextPosition;
+
+        // check if the worst possible gap is at least as big as the minimum allowed gap
+        if (worstCaseGap >= minFutureGap) { // then moving there is possible
+            return true;
+        }
+
+        return false;
+    }
 
     private int getPositionOfNextCar(int[] lane, int current_pos) {
         for (int i = current_pos + 1; i < TrafficSimulation.ROAD_SIZE + current_pos; i++) {

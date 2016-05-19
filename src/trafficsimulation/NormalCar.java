@@ -10,7 +10,7 @@ public class NormalCar extends Car{
 
         maximumSpeed = TrafficSimulation.MAX_NORMAL_CAR_SPEED;
         maximumAcceleration = 1;
-        maximumDeceleration = 1;
+        maximumDeceleration = TrafficSimulation.GLOBAL_MINIMUM_DECELERATION;
         
         Random r = new Random();
         color = new Color(0, r.nextInt(130), 255);

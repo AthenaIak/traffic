@@ -3,11 +3,13 @@ package trafficsimulation;
 public class TrafficSimulation {
 
     public static final int ROAD_SIZE = 60;
-    public static final int NUMBER_OF_NORMAL_CARS = 3;
-    public static final int NUMBER_OF_FAST_CARS = 3;
+    public static final int NUMBER_OF_NORMAL_CARS = 5;
+    public static final int NUMBER_OF_FAST_CARS = 5;
     public static final int MAX_NORMAL_CAR_SPEED = 3;
     public static final int MAX_FAST_CAR_SPEED = 6;
     public static final int GLOBAL_MAXIMUM_DECELERATION = 2;
+    public static final int GLOBAL_MINIMUM_DECELERATION = 1;
+    public static final int GLOBAL_MAXIMUM_ACCELERATION = 2;
 
     /**
      * @param args the command line arguments

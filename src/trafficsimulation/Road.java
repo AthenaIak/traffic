@@ -61,7 +61,7 @@ public class Road {
             else l2[dummyPosition] = tmpC.getSpeed();
 
             // save the dummy position for the next generated cars
-            dummyPosition = Math.floorMod(dummyPosition + Math.floorDiv(tmpC.getSpeed(), tmpC.getMaximumAcceleration()) + 2, TrafficSimulation.ROAD_SIZE);
+            dummyPosition = Math.floorMod(dummyPosition + Math.floorDiv(tmpC.getSpeed(), tmpC.getMaximumAcceleration()) + 3, TrafficSimulation.ROAD_SIZE);
 
             if (lane == 1) l1_dummyPosition = dummyPosition;
             else l2_dummyPosition = dummyPosition;
