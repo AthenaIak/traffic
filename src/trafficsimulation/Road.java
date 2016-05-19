@@ -80,7 +80,11 @@ public class Road {
 
         // move cars (check rules on current road and save new positions in next road)
         for (Car car : cars) {
-            moveCar(car);
+//            moveCar(car);
+            if(!car.move(l1,l2)) System.out.println("Car didn't move!");
+            else{
+                helperL1[car.getPosition()] = car.getSpeed();
+            }
         }
 
         // END OF CALCULATE NEW STATE //////////////////////////////////////////

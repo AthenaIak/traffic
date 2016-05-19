@@ -106,6 +106,14 @@ public abstract class Car {
     public Color getColor() {
         return color;
     }
+    
+    /**
+     * 
+     * @return true if a move was possible
+     */
+    public boolean move(int[] l1, int[] l2){
+        return false;
+    }
 
 
 
