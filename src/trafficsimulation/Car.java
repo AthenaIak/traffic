@@ -42,6 +42,15 @@ public abstract class Car {
         this.rightBlinker = false;
     }
 
+    // see FastCar.java, NormalCar.java
+    public Car(int ID, int lane, int position) {
+        this.ID = ID;
+        this.lane = lane;
+        this.position = position;
+        this.leftBlinker = false;
+        this.rightBlinker = false;
+    }
+
     public int getID() {
         return ID;
     }
@@ -229,6 +238,7 @@ public abstract class Car {
     public int adaptSpeed(int distance_to_next, int speed_of_next) {
         //We need to decelerate
         if (speed_of_next < speed) {
+
             //In this timestep there is enough room, but we may only assume ther isn't in the next.
             //If the speed difference is too big, we need to start decelerating now.
             if (distance_to_next == speed && (speed - speed_of_next) > maximumDeceleration) {
@@ -237,6 +247,7 @@ public abstract class Car {
             else if (distance_to_next < speed) {
                 speed -= Math.min(maximumDeceleration, speed - speed_of_next);
             }
+            
         } // The car in front is driving faster than this car.
         else if (speed_of_next > speed) {
             //The distance to the next car is within the limit, but it will expand.
@@ -259,6 +270,7 @@ public abstract class Car {
                 speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, distance_to_next - speed));
             }
         }
+        
         return speed;
     }
 
