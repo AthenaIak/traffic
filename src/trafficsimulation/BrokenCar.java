@@ -22,7 +22,8 @@ public class BrokenCar extends Car {
     }
 
     @Override
-    public int adaptSpeed(int distance_to_next, int speed_of_next) {
+//    public int adaptSpeed(int distanceToFront, int speedOfFront) {
+    public int adaptSpeed(int distanceToFront, int speedOfFront, int speedOfFrontNextLane, int gapNextLane) {
 
         // The car may break down at this moment.
         if (!isBrokenDown) {
@@ -38,38 +39,38 @@ public class BrokenCar extends Car {
                 }
             } else {
                 //We need to decelerate
-                if (speed_of_next < speed) {
+                if (speedOfFront < speed) {
                     //In this timestep there is enough room, but we may only assume ther isn't in the next.
                     //If the speed difference is too big, we need to start decelerating now.
-                    if (distance_to_next == speed && (speed - speed_of_next) > maximumDeceleration) {
-                        speed -= Math.min(maximumDeceleration, speed - speed_of_next - maximumDeceleration);
+                    if (distanceToFront == speed && (speed - speedOfFront) > maximumDeceleration) {
+                        speed -= Math.min(maximumDeceleration, speed - speedOfFront - maximumDeceleration);
                     } //There is already too little room now, so we need to decelerate.
-                    else if (distance_to_next < speed) {
-                        speed -= Math.min(maximumDeceleration, speed - speed_of_next);
+                    else if (distanceToFront < speed) {
+                        speed -= Math.min(maximumDeceleration, speed - speedOfFront);
                     }
                 }
 
                 // The car in front is driving faster than this car.
-                else if (speed_of_next > speed) {
+                else if (speedOfFront > speed) {
                     //The distance to the next car is within the limit, but it will expand.
                     //If it expands enough, we may accelerate.
-                    if (speed <= distance_to_next) {
-                        speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, (distance_to_next + (speed_of_next - speed)) - speed));
+                    if (speed <= distanceToFront) {
+                        speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, (distanceToFront + (speedOfFront - speed)) - speed));
                     }
                     // The distance to the next car is greater than our speed; we may accelerate
                     else {
                         //The car may only accelerate if the gap created by the speed difference is at least as big as the speed.
-                        if (speed_of_next - speed + distance_to_next > speed) {
-                            speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, speed_of_next - speed_of_next + distance_to_next));
+                        if (speedOfFront - speed + distanceToFront > speed) {
+                            speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, speedOfFront - speedOfFront + distanceToFront));
                         }
                     }
                 } else {
                     //speed of two cars is equal. Only if the distance between the both is large enough, the car may accelerate.
-                    if (speed < distance_to_next) {
+                    if (speed < distanceToFront) {
                         //the car is allowed to accelerate if it is not driving at maximum speed already.
                         //the maximum amount of acceleration is determined both by the physical limits of the car and the
                         //distance to the car ahead.
-                        speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, distance_to_next - speed));
+                        speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, distanceToFront - speed));
                     }
                 }
                 return speed;

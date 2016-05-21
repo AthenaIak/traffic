@@ -26,19 +26,19 @@ public class SleepyCar extends Car {
      * @return : new speed of this car.
      */
     @Override
-    public int adaptSpeed(int distance_to_next, int speed_of_next) {
-
+//    public int adaptSpeed(int distance_to_next, int speed_of_next) {
+    public int adaptSpeed(int distanceToFront, int speedOfFront, int speedOfFrontNextLane, int gapNextLane){
         //We need to decelerate
-        if (distance_to_next < speed) {
-            speed -= Math.min(maximumDeceleration, speed-distance_to_next);
+        if (distanceToFront < speed) {
+            speed -= Math.min(maximumDeceleration, speed-distanceToFront);
         }
-        else if (distance_to_next == speed) {
+        else if (distanceToFront == speed) {
             return speed;
         }
 
         // distance_to_next > speed ==> We may accelerate
         else {
-            speed += Math.min(maximumAcceleration, Math.min(distance_to_next - speed, maximumSpeed - speed));
+            speed += Math.min(maximumAcceleration, Math.min(distanceToFront - speed, maximumSpeed - speed));
         }
         return speed;
     }
