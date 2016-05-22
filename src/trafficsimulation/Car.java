@@ -127,36 +127,60 @@ public abstract class Car {
      * @param distance_to_next : distance to car in front.
      * @param speed_of_next : speed in car in front.
      */
-    public int adaptSpeed(int distanceToFront, int speedOfFront, int speedOfFrontNextLane, int gapNextLane) {
-        boolean debug=false;
-        if (debug)
-            System.out.print("Car " + ID + " at lane " + lane + ": Current speed " + speed + ", speed of front " + speedOfFront + ", distance to front " + distanceToFront + ". ");
+    public int adaptSpeed(int speedOfFront, int distanceToFront, int speedOfFrontNextLane, int distanceToFrontNextLane, 
+            int speedOfBehindNextLane, int distanceToBehindNextLane) {
+        if (TrafficSimulation.DEBUG)
+            System.out.print("Car " + ID + " lane " + lane + " pos " + position + " speed " + speed + 
+                    ", sFront " + speedOfFront + ", dFront " + distanceToFront + 
+                    ", sFrontNext " + speedOfFrontNextLane + ", dFrontNext " + distanceToFrontNextLane + 
+                    ", sBehindNext " + speedOfBehindNextLane + " dBehindNext " + distanceToBehindNextLane + ". ");
 
-        int gapToChange = TrafficSimulation.MAXIMUM_SPEED_SYSTEM + 1 + speed;
+        boolean goodGapToChange = (distanceToBehindNextLane >= TrafficSimulation.MAXIMUM_SPEED_SYSTEM && distanceToFrontNextLane >= speed);
+        boolean changeLaneAlready = false;
         
-        if (distanceToFront <= TrafficSimulation.DISTANCE_AHEAD){
-            // consider changing lane
-            if ((lane==TrafficSimulation.RIGHT_LANE) && (speedOfFront <= speed || speedOfFrontNextLane <=speed) && gapNextLane >= gapToChange){
-                lane = TrafficSimulation.LEFT_LANE;
-                if (debug)
-                    System.out.print("Change to left lane. ");
-            }
+        if (distanceToFront <= TrafficSimulation.DISTANCE_TO_LOOK_AHEAD){
             
-            if ((lane==TrafficSimulation.LEFT_LANE) && (speedOfFront > speed && speedOfFrontNextLane > speed) && gapNextLane >= gapToChange){
-                lane = TrafficSimulation.RIGHT_LANE;
-                if (debug)
-                    System.out.println("Change to right lane. ");
+            // forcing changing lane
+            if (speedOfFront == 0){
+                // check security criteria - enough gap
+                if (goodGapToChange) {
+                    if (lane==TrafficSimulation.RIGHT_LANE) lane = TrafficSimulation.LEFT_LANE;
+                    else lane = TrafficSimulation.RIGHT_LANE;
+                    changeLaneAlready = true;
+                    if (TrafficSimulation.DEBUG)
+                        System.out.print("Force changing lane. ");
+                }
             }
         }
+        
+        if (!changeLaneAlready){
+            // consider changing lane
+            
+            if (lane==TrafficSimulation.LEFT_LANE && distanceToFrontNextLane > TrafficSimulation.DISTANCE_TO_LOOK_AHEAD && 
+                    speedOfFrontNextLane != 0 && goodGapToChange){
+                lane = TrafficSimulation.RIGHT_LANE;
+                if (TrafficSimulation.DEBUG)
+                    System.out.println("Change to right. ");            
+            }
 
+            if (lane==TrafficSimulation.RIGHT_LANE && distanceToFront < TrafficSimulation.DISTANCE_TO_LOOK_AHEAD &&
+                    speedOfFrontNextLane != 0 && (speedOfFront <= speed || speedOfFrontNextLane <=speed) && goodGapToChange){
+                lane = TrafficSimulation.LEFT_LANE;
+                if (TrafficSimulation.DEBUG)
+                    System.out.print("Change to left. ");            
+            }
+        }
+        
+        // adjust speed        
         if (speed < TrafficSimulation.MAXIMUM_SPEED_SYSTEM) speed += 1;
         if (speed > distanceToFront) speed = distanceToFront;
-        if (speed >= 1){
-            Random r = new Random();
-            if (r.nextDouble() < TrafficSimulation.PROBABILITY_FLUCTUATION) speed --;
-        }
-        if (debug)
-            System.out.println("Adjusted speed " + speed + "\n");
+//        if (speed >= 1){
+//            Random r = new Random();
+//            if (r.nextDouble() < TrafficSimulation.PROBABILITY_FLUCTUATION) speed --;
+//        }
+        
+        if (TrafficSimulation.DEBUG)
+            System.out.println("New speed " + speed + ", new lane " + lane + "\n");
         return speed;
     }
 

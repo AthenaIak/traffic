@@ -8,24 +8,24 @@ public class Road {
 
     private ArrayList<Car> cars; // I chose arraylist so that it is extendable for non-circular road
 
-    private int[] l1; // lane 1 values: current speed of car (or -1 if no car)
-    private int[] l2; // lane 2
+    private int[] leftLane;     // lane 1 values: current speed of car (or -1 if no car)
+    private int[] rightLane;    // lane 2
 
-    private int[] helperL1;
-    private int[] helperL2;
+    private int[] helperLeft;
+    private int[] helperRight;
 
     public Road() {
         // Initialise variables
         cars = new ArrayList<>();
-        l1 = new int[TrafficSimulation.ROAD_SIZE];
-        l2 = new int[TrafficSimulation.ROAD_SIZE];
+        leftLane = new int[TrafficSimulation.ROAD_SIZE];
+        rightLane = new int[TrafficSimulation.ROAD_SIZE];
 
-        helperL1 = new int[TrafficSimulation.ROAD_SIZE];
-        helperL2 = new int[TrafficSimulation.ROAD_SIZE];
+        helperLeft = new int[TrafficSimulation.ROAD_SIZE];
+        helperRight = new int[TrafficSimulation.ROAD_SIZE];
 
-        for (int i = 0; i < helperL1.length; i++) {
-            l1[i] = -1;
-            l2[i] = -1;
+        for (int i = 0; i < helperLeft.length; i++) {
+            leftLane[i] = -1;
+            rightLane[i] = -1;
         }
 
         Random r = new Random();
@@ -33,45 +33,45 @@ public class Road {
         int numCars = TrafficSimulation.NUMBER_OF_NORMAL_CARS + TrafficSimulation.NUMBER_OF_FAST_CARS;
         int [] lanes = new int[numCars];
         
-        int numCarsInLane1 = 0;
-        int numCarsInLane2 = 0;
+        int numCarsInLeft = 0;
+        int numCarsInRight = 0;
         for (int i = 0; i < numCars; i++) {
             // randomly choose lane for cars
             lanes[i] = r.nextInt(2) + 1;
-            if (lanes[i]==1) 
-                numCarsInLane1++;
+            if (lanes[i]==TrafficSimulation.LEFT_LANE) 
+                numCarsInLeft++;
             else
-                numCarsInLane2++;
+                numCarsInRight++;
         }
 
         // determine the distance between cars in each lane
-        int distanceLane1;
-        int distanceLane2;        
-        if (numCarsInLane1 <= 1)
-            distanceLane1 = TrafficSimulation.ROAD_SIZE / 2;    // middle of the road on that lane
+        int distanceLeftLane;
+        int distanceRightLane;        
+        if (numCarsInLeft <= 1)
+            distanceLeftLane = TrafficSimulation.ROAD_SIZE / 2;    // middle of the road on that lane
         else
-            distanceLane1 = (TrafficSimulation.ROAD_SIZE-10)/(numCarsInLane1-1);                    
-        if (numCarsInLane2 <= 1)
-            distanceLane2 = TrafficSimulation.ROAD_SIZE / 2;    // middle of the road on that lane
+            distanceLeftLane = (TrafficSimulation.ROAD_SIZE-10)/(numCarsInLeft-1);                    
+        if (numCarsInRight <= 1)
+            distanceRightLane = TrafficSimulation.ROAD_SIZE / 2;    // middle of the road on that lane
         else
-            distanceLane2 = (TrafficSimulation.ROAD_SIZE-10)/(numCarsInLane2-1);
+            distanceRightLane = (TrafficSimulation.ROAD_SIZE-10)/(numCarsInRight-1);
 
         // randomly generate a car depending on rules (to avoid collisions)
         int l1_dummyPosition = 0, l2_dummyPosition = 0, dummyPosition = 0;
         Car tmpC;
         int normal_generated = 0, fast_generated = 0;
         int lane, type_of_car, speed;
-        numCarsInLane1 = 0;
-        numCarsInLane2 = 0;
+        numCarsInLeft = 0;
+        numCarsInRight = 0;
         for (int i = 0; i < numCars; i++) {
             // randomly choose lane
-            if (lanes[i] == 1){
-                dummyPosition = numCarsInLane1 * distanceLane1;
-                numCarsInLane1 ++;
+            if (lanes[i] == TrafficSimulation.LEFT_LANE){
+                dummyPosition = numCarsInLeft * distanceLeftLane;
+                numCarsInLeft ++;
             }
             else {
-                dummyPosition = numCarsInLane2 * distanceLane2;
-                numCarsInLane2 ++;
+                dummyPosition = numCarsInRight * distanceRightLane;
+                numCarsInRight ++;
             }
 
             // randomly choose the type of car (unless we the limit is reached)
@@ -93,22 +93,38 @@ public class Road {
             cars.add(tmpC);
 
             // save data to the road structure (lanes)
-            if (lanes[i] == 1) l1[dummyPosition] = tmpC.getSpeed();
-            else l2[dummyPosition] = tmpC.getSpeed();
+            if (lanes[i] == TrafficSimulation.LEFT_LANE) leftLane[dummyPosition] = tmpC.getSpeed();
+            else rightLane[dummyPosition] = tmpC.getSpeed();
         }
-//        tmpC = new BrokenCar(TrafficSimulation.NUMBER_OF_FAST_CARS + TrafficSimulation.NUMBER_OF_NORMAL_CARS, r.nextInt(9) + 1, 1, dummyPosition, 0.3);
-//        cars.add(tmpC);
-//        l1[dummyPosition] = tmpC.getSpeed();
-        System.out.println("Lane 1\n" + Arrays.toString(l1) + "\n");
-        System.out.println("Lane 2\n" + Arrays.toString(l2) + "\n");
+        
+        // get lane for broken car
+        lane = r.nextInt(1) + 1;
+        int [] laneOfBroken;
+        if (lane==TrafficSimulation.LEFT_LANE)
+            laneOfBroken = leftLane;
+        else
+            laneOfBroken = rightLane;
+        
+        while (true){
+            dummyPosition = r.nextInt(TrafficSimulation.ROAD_SIZE/4);
+            if (laneOfBroken[dummyPosition] == -1)
+                break;
+        }            
+        
+        tmpC = new BrokenCar(TrafficSimulation.NUMBER_OF_FAST_CARS + TrafficSimulation.NUMBER_OF_NORMAL_CARS, 0, lane, dummyPosition, 0.3);
+        cars.add(tmpC);
+        laneOfBroken[dummyPosition] = tmpC.getSpeed();
+        
+        System.out.println("Lane 1\n" + Arrays.toString(leftLane) + "\n");
+        System.out.println("Lane 2\n" + Arrays.toString(rightLane) + "\n");
     }
 
     public void nextState() {
         // CALCULATE NEW STATE /////////////////////////////////////////////////
         // clear helper lanes
-        for (int i = 0; i < helperL1.length; i++) {
-            helperL1[i] = -1;
-            helperL2[i] = -1;
+        for (int i = 0; i < helperLeft.length; i++) {
+            helperLeft[i] = -1;
+            helperRight[i] = -1;
         }
 
         // move cars (check rules on current road and save new positions in next road)
@@ -119,8 +135,8 @@ public class Road {
         // END OF CALCULATE NEW STATE //////////////////////////////////////////
         //
         // set new state
-        l1 = helperL1.clone();
-        l2 = helperL2.clone();
+        leftLane = helperLeft.clone();
+        rightLane = helperRight.clone();
     }
 
     private void moveCar(Car car) {
@@ -128,109 +144,133 @@ public class Road {
         int position = car.getPosition();
         int speed = car.getSpeed();
 
-        //find new position and new speed (if there is a change in speed)
-        //For now we assume that the cars don't change lanes.
-        int newLane = lane;
-        //To know the new speed and position, we need to know the distance to and speed of the car in front.
-        int nextCarPosition = getPositionOfNextCar(position, lane);
-        int distanceToFront = Math.floorMod(nextCarPosition - position - 1, TrafficSimulation.ROAD_SIZE);
+        int positionOfCarFront = getPositionOfCarFront(lane, position);
+        int distanceToFront = getDistanceBetweenCars(positionOfCarFront, position);      
         int speedOfFront;
-        int otherLane;
+        int[] otherLane;        
         if (lane == TrafficSimulation.RIGHT_LANE) {
-            speedOfFront = l1[nextCarPosition];
-            if (l2[position] != -1)
-                otherLane = -1;     // another car is running in parallel in the other lane
+            speedOfFront = getSpeedOfCar(rightLane, positionOfCarFront);
+            if (leftLane[position] != -1)
+                otherLane = null;     // another car is running in parallel on the other lane
             else
-                otherLane = TrafficSimulation.LEFT_LANE;
+                otherLane = leftLane;
         }
         else {
-            speedOfFront = l2[nextCarPosition];
-            if (l1[position] != -1)
-                otherLane = -1;     // another car is running in parallel in the other lane
+            speedOfFront = getSpeedOfCar(leftLane, positionOfCarFront);
+            if (rightLane[position] != -1)
+                otherLane = null;     // another car is running in parallel in the other lane
             else
-                otherLane = TrafficSimulation.RIGHT_LANE;
+                otherLane = rightLane;
         }
+
         int newSpeed;
-        if (otherLane == -1)
-            newSpeed = car.adaptSpeed(distanceToFront, speedOfFront, TrafficSimulation.MAXIMUM_SPEED_SYSTEM, 0);
+        if (otherLane == null)
+            newSpeed = car.adaptSpeed(speedOfFront, distanceToFront, TrafficSimulation.MAXIMUM_SPEED_SYSTEM, 0, 0, 0);
         else{
-            int positionOfFrontNextLane = getPositionOfNextCar(position, otherLane);
-            int positionOfBehindNextLane;
-            int speedOfFrontNextLane;
-            if (otherLane == TrafficSimulation.RIGHT_LANE){
-                speedOfFrontNextLane = l1[positionOfFrontNextLane];
-                positionOfBehindNextLane = getPositionOfCarBehind(l1, otherLane);
-            }
-            else{
-                speedOfFrontNextLane = l2[positionOfFrontNextLane];
-                positionOfBehindNextLane = getPositionOfCarBehind(l2, otherLane);
-            }
-            newSpeed = car.adaptSpeed(distanceToFront, speedOfFront, speedOfFrontNextLane, positionOfFrontNextLane-positionOfBehindNextLane);
+            int positionOfFrontNextLane = getPositionOfCarFront(otherLane, position);
+            int positionOfBehindNextLane = getPositionOfCarBehind(otherLane, position);
+            newSpeed = car.adaptSpeed(speedOfFront, distanceToFront, 
+                    getSpeedOfCar(otherLane, positionOfFrontNextLane), getDistanceBetweenCars(positionOfFrontNextLane, position), 
+                    getSpeedOfCar(otherLane, positionOfBehindNextLane), getDistanceBetweenCars(positionOfBehindNextLane, position));
         }
 
         //Position depends on the speed of the car in front
         //and the speed at which that car is driving.
-        int newPosition = Math.floorMod(position + speed, TrafficSimulation.ROAD_SIZE);
+        int newPosition = Math.floorMod(position + newSpeed, TrafficSimulation.ROAD_SIZE);
 
+        int newLane = car.lane;
+        
         // commit the changes
         car.setLane(newLane);
         car.setPosition(newPosition);
         //Setting the new speed is already done during the call to adaptSpeed();
 
         if (newLane == 1) {
-            helperL1[newPosition] = newSpeed;
+            helperLeft[newPosition] = newSpeed;
         } else {
-            helperL2[newPosition] = newSpeed;
+            helperRight[newPosition] = newSpeed;
         }
     }
 
-    private int getPositionOfNextCar(int current_pos, int lane) {
-        int distance = 0;
-        for (int i = current_pos + 1; i < TrafficSimulation.ROAD_SIZE + current_pos; i++) {
-            int correct_i = Math.floorMod(i, TrafficSimulation.ROAD_SIZE);
-            if (lane == 1 && l1[correct_i] != -1) {
-                return correct_i;
-            } else if (lane == 2 && l2[correct_i] != -1) {
-                return correct_i;
-            }
+    private int getSpeedOfCar(int lane, int position) {
+        if (lane == TrafficSimulation.LEFT_LANE)
+            return getSpeedOfCar(leftLane, position);
+        else
+            return getSpeedOfCar(rightLane, position);
+    }
+    
+    private int getSpeedOfCar(int[] lane, int position) {
+        if (position >= TrafficSimulation.ROAD_SIZE || position < -1){
+            System.out.println("Road.getSpeedOfCar() wrong position");
+            return -1;
         }
-        return -1;
+            
+        if (position == -1)
+            return 0;   // no car
+        else
+            return lane[position];
+    }
+    
+    private int getDistanceBetweenCars(int current_pos, int posOther) {
+        if (posOther == -1)
+            return TrafficSimulation.ROAD_SIZE;
+        else
+            return Math.abs(current_pos - posOther - 1);
+    }
+    
+    private int getPositionOfCarFront(int lane, int current_pos) {
+        if (lane == TrafficSimulation.LEFT_LANE)
+            return getPositionOfCarFront(leftLane, current_pos);
+        else
+            return getPositionOfCarFront(rightLane, current_pos);
+    }  
+    
+    private int getPositionOfCarFront(int[] lane, int current_pos) {
+        for (int i = current_pos + 1; i < TrafficSimulation.ROAD_SIZE; i++) {
+            if (lane[i] != -1)
+                return i;
+        }      
+        return -1;      // no car in front
     }
 
-    // get position of the car behind the given position current_pos on the given lane
+    private int getPositionOfCarBehind(int lane, int current_pos) {
+        if (lane == TrafficSimulation.LEFT_LANE)
+            return getPositionOfCarBehind(leftLane, current_pos);
+        else
+            return getPositionOfCarBehind(rightLane, current_pos);      
+    }
+    
     private int getPositionOfCarBehind(int[] lane, int current_pos) {
-        for (int i = current_pos + TrafficSimulation.ROAD_SIZE; i > current_pos; i--) {
-            int correct_i = Math.floorMod(i, TrafficSimulation.ROAD_SIZE);
-            if (lane[correct_i] != -1) {
-                return correct_i;
-            }
+        for (int i = current_pos-1; i >= 0; i--) {
+            if (lane[i] != -1)
+                return i;
         }
-        return -1;
+        return -1;      // no car behind
     }
     
     public void printTrafficSituation() {
         String traffic_l1 = "";
         String positions = "";
-        for (int i = 0; i < l1.length; i++) {
-            if (l1[i] == -1) {
+        for (int i = 0; i < leftLane.length; i++) {
+            if (leftLane[i] == -1) {
                 traffic_l1 += "_";
             } else {
-                traffic_l1 += toHex(l1[i]);
+                traffic_l1 += toHex(leftLane[i]);
             }
         }
 
         traffic_l1 += "|";
         String traffic_l2 = "";
         positions = "";
-        for (int i = 0; i < l2.length; i++) {
-            if (l2[i] == -1) {
+        for (int i = 0; i < rightLane.length; i++) {
+            if (rightLane[i] == -1) {
                 traffic_l2 += "_";
             } else {
-                traffic_l2 += toHex(l2[i]);
+                traffic_l2 += toHex(rightLane[i]);
             }
         }
         traffic_l2 += "|";
-        System.out.println(traffic_l1 + "\t" + traffic_l2 + "\n");
+        System.out.println(traffic_l1 + "\n" + traffic_l2 + "\n");
     }
 
     private char toHex(int input) {

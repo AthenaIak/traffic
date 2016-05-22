@@ -27,7 +27,9 @@ public class SleepyCar extends Car {
      */
     @Override
 //    public int adaptSpeed(int distance_to_next, int speed_of_next) {
-    public int adaptSpeed(int distanceToFront, int speedOfFront, int speedOfFrontNextLane, int gapNextLane){
+    public int adaptSpeed(int speedOfFront, int distanceToFront, int speedOfFrontNextLane, int distanceToFrontNextLane, 
+            int speedOfBehindNextLane, int distanceToBehindNextLane) {
+
         //We need to decelerate
         if (distanceToFront < speed) {
             speed -= Math.min(maximumDeceleration, speed-distanceToFront);
