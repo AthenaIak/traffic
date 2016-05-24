@@ -44,7 +44,7 @@ public class Animation extends Applet implements Runnable {
             } catch (Exception e) {
                 System.out.println(e.toString());
             }
-            System.out.println(road.printFlow());
+            System.out.println(road.printFlow(numRuns));
         }
         
     }
