@@ -215,5 +215,14 @@ public class Road {
     public ArrayList<Car> getCars() {
         return cars;
     }
+    
+    public void printFlow(int numIterations) {
+        int totalDistance = 0;
+        for(Car c : cars){
+            totalDistance += c.getTraveledDistance();
+        }
+        double flow = ((double)totalDistance) / (numIterations * TrafficSimulation.ROAD_SIZE * 2 * cars.size());
+        System.out.println("Flow per lane: " + flow);
+    }
 
 }
