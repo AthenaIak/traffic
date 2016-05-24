@@ -32,6 +32,8 @@ public abstract class Car {
     protected int maximumAcceleration;
     protected int maximumDeceleration;
     protected Color color;
+    
+    protected int traveledDistance;
 
     public Car(int ID, int speed, int lane, int position) {
         this.ID = ID;
@@ -49,12 +51,18 @@ public abstract class Car {
         this.position = position;
         this.leftBlinker = false;
         this.rightBlinker = false;
+        this.traveledDistance = 0;
     }
 
     public int getID() {
         return ID;
     }
-
+    
+    public int getTraveledDistance() {
+        return traveledDistance;
+    }
+    
+    
     public int getSpeed() {
         return speed;
     }
@@ -122,6 +130,7 @@ public abstract class Car {
      * @return true if a move was possible for the car.
      */
     public boolean move(int[] l1, int[] l2) {
+        this.traveledDistance += speed;
         int desiredPosition = speed + maximumAcceleration < maximumSpeed ? position + speed + maximumAcceleration : position + maximumSpeed;
         int minimumPosition = speed - maximumDeceleration > 0 ? position + speed - maximumDeceleration : position;
 
@@ -164,7 +173,7 @@ public abstract class Car {
                 }
             }
         }
-
+        
         return false;
     }
 
