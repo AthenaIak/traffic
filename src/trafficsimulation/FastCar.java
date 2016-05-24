@@ -22,9 +22,9 @@ public class FastCar extends Car {
 
         // make max_speed of car not always the same
         if (r.nextFloat()<0.5){
-            maximumSpeed = TrafficSimulation.MAX_FAST_CAR_SPEED - 1;
+            maximumSpeed = TrafficSimulation.MAX_FAST_CAR_SPEED - r.nextInt(2);
         }else{
-            maximumSpeed = TrafficSimulation.MAX_FAST_CAR_SPEED + r.nextInt(1);
+            maximumSpeed = TrafficSimulation.MAX_FAST_CAR_SPEED + r.nextInt(2);
         }   
         speed = maximumSpeed - r.nextInt(1);    // around the max speed at beginning
         maximumAcceleration = TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION;
