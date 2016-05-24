@@ -221,7 +221,7 @@ public class Road {
         for(Car c : cars){
             totalDistance += c.getTraveledDistance();
         }
-        double flow = ((double)totalDistance) / (numIterations * TrafficSimulation.ROAD_SIZE * 2 * cars.size());
+        double flow = ((double)totalDistance) / (numIterations * TrafficSimulation.ROAD_SIZE * 2 * (TrafficSimulation.NUMBER_OF_NORMAL_CARS + TrafficSimulation.NUMBER_OF_FAST_CARS);
         System.out.println("Flow per lane: " + flow);
     }
 
