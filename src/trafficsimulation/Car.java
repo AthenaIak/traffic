@@ -135,6 +135,10 @@ public abstract class Car {
 
         int nextCarSameLspeed, nextCarDiffLspeed, nextSpeed;
 
+        Random r = new Random();
+        if(lane == 1 && r.nextDouble()<0.5) desiredPosition--;
+        if(lane == 2 && r.nextDouble()<0.05) desiredPosition--;
+
         // iterate through all possible positions (starting from the most desired)
         for (int nextPosition = desiredPosition; nextPosition >= minimumPosition; nextPosition--) { //nextPosition is not rounded to road size yet
             nextSpeed = nextPosition - position;
