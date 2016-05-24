@@ -26,7 +26,7 @@ public class FastCar extends Car {
         }else{
             maximumSpeed = TrafficSimulation.MAX_FAST_CAR_SPEED + r.nextInt(2);
         }   
-        speed = maximumSpeed - r.nextInt(1);    // around the max speed at beginning
+        speed = maximumSpeed - r.nextInt(3);    // around the max speed at beginning
         maximumAcceleration = TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION;
         maximumDeceleration = TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION;
 
