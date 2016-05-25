@@ -93,7 +93,7 @@ public class Road {
         // move cars (check rules on current road and save new positions in next road)
         for (Car car : cars) {
             // for debugging
-            System.out.println("Car " + car.getID() + " at lane " + car.getLane() + ", max speed " + car.getMaximumSpeed() + ": Current speed " + car.getSpeed() + ", current position " + car.getPosition() + "\n");
+//            System.out.println("Car " + car.getID() + " at lane " + car.getLane() + ", max speed " + car.getMaximumSpeed() + ": Current speed " + car.getSpeed() + ", current position " + car.getPosition() + "\n");
 
 //            moveCar(car);
             if (!car.move(l1, l2)) {
@@ -105,7 +105,7 @@ public class Road {
             }
         
             // for debugging
-            System.out.println("New speed " + car.getSpeed() + ", new position " + car.getPosition() + "\n");
+//            System.out.println("New speed " + car.getSpeed() + ", new position " + car.getPosition() + "\n");
             
             
         }

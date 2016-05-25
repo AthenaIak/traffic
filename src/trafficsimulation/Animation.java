@@ -9,7 +9,8 @@ public class Animation extends Applet implements Runnable {
     public Thread t;
     private final Road road = new Road();
     private static final int cooldown = 1000; //cooldown between steps of the simulation
-    private static final int numIterations = 200;
+    private int carWidth = 30;
+    private int carHeight = 10;
 
     @Override
     public void start() {
@@ -30,12 +31,12 @@ public class Animation extends Applet implements Runnable {
     public void run() {
         Thread t1 = Thread.currentThread();
         road.printTrafficSituation();
-        
+
         int numRuns = 0;
 
         while (t == t1) {
             numRuns++;
-            
+
             road.nextState();
             road.printTrafficSituation();
             repaint();
@@ -44,12 +45,13 @@ public class Animation extends Applet implements Runnable {
             } catch (Exception e) {
                 System.out.println(e.toString());
             }
-            System.out.println(road.printFlow(numRuns));
+            if (numRuns % 100 == 0)
+                road.printFlow(numRuns);
         }
-        
+
     }
 
-    int carWidth = 30, carHeight = 10;
+    
 
     @Override
     public void paint(Graphics g) {
@@ -72,7 +74,7 @@ public class Animation extends Applet implements Runnable {
 //                g.setColor(Color.blue);
 //            else if (c.getClass().toString().equals("class trafficsimulation.FastCar"))
 //                g.setColor(Color.red);
-            
+
             // individual colour for each car
             g.setColor(c.getColor());
             if (c.getLane() == 1)
