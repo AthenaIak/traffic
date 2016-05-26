@@ -15,7 +15,7 @@ public class FastCar extends Car {
         color = new Color(255, r.nextInt(130), 0);
     }
 
-    // let car determines its speed
+    // let car determine its speed
     public FastCar(int ID, int lane, int position) {
         super(ID, lane, position);
         Random r = new Random();

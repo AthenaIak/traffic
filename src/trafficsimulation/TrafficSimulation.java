@@ -5,7 +5,9 @@ public class TrafficSimulation {
 //    public static final int ROAD_SIZE = 60;
     public static final int NUMBER_OF_NORMAL_CARS = 5;
     public static final int NUMBER_OF_FAST_CARS = 5;
-    
+    public static final int SIMULATION_STEP_COOLDOWN = 1000;
+    public static final int CAR_WIDTH = 30;
+
     public static final int MAX_NORMAL_CAR_SPEED = 8;
     public static final int MAX_FAST_CAR_SPEED = 11;
     public static final int GLOBAL_MAXIMUM_DECELERATION = 2;
@@ -13,19 +15,13 @@ public class TrafficSimulation {
     public static final int GLOBAL_MAXIMUM_ACCELERATION = 2;
 
     public static final int ROAD_SIZE = MAX_NORMAL_CAR_SPEED * NUMBER_OF_NORMAL_CARS + MAX_FAST_CAR_SPEED * NUMBER_OF_FAST_CARS;         // approx. number of cars x maximum speed
-    public static final double THRESHOLD_OBEY_LAW =  0.2;   // greater is obeying law
-    
-    
+    public static final double THRESHOLD_OBEY_LAW = 0.2;   // greater is obeying law
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {        
-        Road road = new Road();
-        road.printTrafficSituation();
-        for (int i = 0; i < 30; i++) {
-            road.nextState();
-            road.printTrafficSituation();
-        }
+    public static void main(String[] args) {
+        new Animation().runSimulation();
     }
 }
 

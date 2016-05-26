@@ -117,39 +117,39 @@ public class Road {
         l2 = helperL2.clone();
     }
 
-    private void moveCar(Car car) {
-        int lane = car.getLane();
-        int position = car.getPosition();
-        int speed = car.getSpeed();
-
-        //find new position and new speed (if there is a change in speed)
-        //For now we assume that the cars don't change lanes.
-        int newLane = lane;
-        //To know the new speed and position, we need to know the distance to and speed of the car in front.
-        int nextCarPosition = getPositionOfNextCar(position, lane);
-        int distanceToNextCar = Math.floorMod(nextCarPosition - position - 1, TrafficSimulation.ROAD_SIZE);
-        int nextCarSpeed;
-
-        if (lane == 1) nextCarSpeed = l1[nextCarPosition];
-        else nextCarSpeed = l2[nextCarPosition];
-
-        int newSpeed = car.adaptSpeed(distanceToNextCar, nextCarSpeed);
-
-        //Position depends on the speed of the car in front
-        //and the speed at which that car is driving.
-        int newPosition = Math.floorMod(position + speed, TrafficSimulation.ROAD_SIZE);
-
-        // commit the changes
-        car.setLane(newLane);
-        car.setPosition(newPosition);
-        //Setting the new speed is already done during the call to adaptSpeed();
-
-        if (newLane == 1) {
-            helperL1[newPosition] = newSpeed;
-        } else {
-            helperL2[newPosition] = newSpeed;
-        }
-    }
+//    private void moveCar(Car car) {
+//        int lane = car.getLane();
+//        int position = car.getPosition();
+//        int speed = car.getSpeed();
+//
+//        //find new position and new speed (if there is a change in speed)
+//        //For now we assume that the cars don't change lanes.
+//        int newLane = lane;
+//        //To know the new speed and position, we need to know the distance to and speed of the car in front.
+//        int nextCarPosition = getPositionOfNextCar(position, lane);
+//        int distanceToNextCar = Math.floorMod(nextCarPosition - position - 1, TrafficSimulation.ROAD_SIZE);
+//        int nextCarSpeed;
+//
+//        if (lane == 1) nextCarSpeed = l1[nextCarPosition];
+//        else nextCarSpeed = l2[nextCarPosition];
+//
+//        int newSpeed = car.adaptSpeed(distanceToNextCar, nextCarSpeed);
+//
+//        //Position depends on the speed of the car in front
+//        //and the speed at which that car is driving.
+//        int newPosition = Math.floorMod(position + speed, TrafficSimulation.ROAD_SIZE);
+//
+//        // commit the changes
+//        car.setLane(newLane);
+//        car.setPosition(newPosition);
+//        //Setting the new speed is already done during the call to adaptSpeed();
+//
+//        if (newLane == 1) {
+//            helperL1[newPosition] = newSpeed;
+//        } else {
+//            helperL2[newPosition] = newSpeed;
+//        }
+//    }
 
     private int getPositionOfNextCar(int current_pos, int lane) {
         int distance = 0;
