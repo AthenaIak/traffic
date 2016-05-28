@@ -43,7 +43,7 @@ final public class Animation {
         // put everything on the frame
         frame.getContentPane().add(BorderLayout.CENTER, jsp);
         frame.setResizable(true);
-        frame.setSize(1300, 400);
+        frame.setSize(2000, 400);
         frame.setLocationByPlatform(true);
         frame.setVisible(true);
 

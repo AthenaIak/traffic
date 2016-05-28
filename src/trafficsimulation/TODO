@@ -11,10 +11,11 @@ package trafficsimulation;
  * TODO: Make the loop to move car in Road.nextState() become randomly moving, not sequential as current, so the car which is moved first will have priority in choosing new position on road - Hue's suggestion. Athena: I disagree; we should make it work parallel.
  */
 
-26/05/16 (Athena):
-TODO: Troubleshoot car movement (message "car didn't move" appears, but it should never appear).
+(Athena):
+TODO: Troubleshoot car movement (message "car didn't move" appears, but it should never appear). (Kind of improved)
 TODO: Clear code. There are some weird things like THRESHOLD_OBEY_LAW that I have no clue where they came from. We also haven't discussed about how much (and which type(s) of) randomness we will add/keep.
 TODO: (unimportant) Add UI to control global conditions such as carWidth.
+TODO: Improve minimumGap calculation (especially for previous car).
 
 - calculate desired position:
     new desired position = prev_pos + speed + max_acc

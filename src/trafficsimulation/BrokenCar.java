@@ -39,7 +39,7 @@ public class BrokenCar extends Car {
         if (rand < breakDownProb) // car breaks down with a small probability
             isBrokenDown = true;
 
-        if (rand > 1 - getFixedProb) // car gets fixed with a small probability
+        if (TrafficSimulation.REPAIR_BROKEN_CAR && rand > 1 - getFixedProb) // car gets fixed with a small probability
             isBrokenDown = false;
 
         return moved;

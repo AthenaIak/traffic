@@ -65,16 +65,15 @@ public class Road {
 
             // save the dummy position for the next generated cars
 //            dummyPosition = Math.floorMod(dummyPosition + Math.floorDiv(tmpC.getSpeed(), tmpC.getMaximumAcceleration()) + 3, TrafficSimulation.ROAD_SIZE);
-
             // follow the 2-seconds rule with randomness, so cars distance will be between [1.5 speed, 2.5 speed]
-            dummyPosition = Math.floorMod(dummyPosition + tmpC.getSpeed() + tmpC.getSpeed()/2 + r.nextInt(tmpC.getSpeed()), TrafficSimulation.ROAD_SIZE);
+            dummyPosition = Math.floorMod(dummyPosition + tmpC.getSpeed() + tmpC.getSpeed() / 2 + r.nextInt(tmpC.getSpeed()), TrafficSimulation.ROAD_SIZE);
 
             if (lane == 1) l1_dummyPosition = dummyPosition;
             else l2_dummyPosition = dummyPosition;
         }
-//        tmpC = new BrokenCar(TrafficSimulation.NUMBER_OF_FAST_CARS + TrafficSimulation.NUMBER_OF_NORMAL_CARS, r.nextInt(9) + 1, 1, dummyPosition, 0.3);
-//        cars.add(tmpC);
-//        l1[dummyPosition] = tmpC.getSpeed();
+        tmpC = new BrokenCar(TrafficSimulation.NUMBER_OF_FAST_CARS + TrafficSimulation.NUMBER_OF_NORMAL_CARS, r.nextInt(9) + 1, 1, dummyPosition, 0.3);
+        cars.add(tmpC);
+        l1[dummyPosition] = tmpC.getSpeed();
 
         // for debugging
         System.out.println("Lane 1\n" + Arrays.toString(l1) + "\n");
@@ -97,17 +96,14 @@ public class Road {
 
 //            moveCar(car);
             if (!car.move(l1, l2)) {
-                System.out.println("Car didn't move! \n" + car);
-            } else {
-                if (car.getLane() == 1)
-                    helperL1[car.getPosition()] = car.getSpeed();
-                else helperL2[car.getPosition()] = car.getSpeed();
+                System.out.println("Car decelerated because it had no legal moves! \n" + car);
             }
-        
+            if (car.getLane() == 1)
+                helperL1[car.getPosition()] = car.getSpeed();
+            else helperL2[car.getPosition()] = car.getSpeed();
+
             // for debugging
 //            System.out.println("New speed " + car.getSpeed() + ", new position " + car.getPosition() + "\n");
-            
-            
         }
 
         // END OF CALCULATE NEW STATE //////////////////////////////////////////
@@ -150,7 +146,6 @@ public class Road {
 //            helperL2[newPosition] = newSpeed;
 //        }
 //    }
-
     private int getPositionOfNextCar(int current_pos, int lane) {
         int distance = 0;
         for (int i = current_pos + 1; i < TrafficSimulation.ROAD_SIZE + current_pos; i++) {
@@ -215,13 +210,13 @@ public class Road {
     public ArrayList<Car> getCars() {
         return cars;
     }
-    
+
     public void printFlow(int numIterations) {
         int totalDistance = 0;
-        for(Car c : cars){
+        for (Car c : cars) {
             totalDistance += c.getTraveledDistance();
         }
-        double flow = ((double)totalDistance) / (numIterations * TrafficSimulation.ROAD_SIZE * 2 * (TrafficSimulation.NUMBER_OF_NORMAL_CARS + TrafficSimulation.NUMBER_OF_FAST_CARS));
+        double flow = ((double) totalDistance) / (numIterations * TrafficSimulation.ROAD_SIZE * 2 * (TrafficSimulation.NUMBER_OF_NORMAL_CARS + TrafficSimulation.NUMBER_OF_FAST_CARS));
         System.out.println("Flow per lane: " + flow);
     }
 

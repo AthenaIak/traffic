@@ -2,11 +2,12 @@ package trafficsimulation;
 
 public class TrafficSimulation {
 
-//    public static final int ROAD_SIZE = 60;
+//    public static final int ROAD_SIZE = 150;
     public static final int NUMBER_OF_NORMAL_CARS = 5;
     public static final int NUMBER_OF_FAST_CARS = 5;
     public static final int SIMULATION_STEP_COOLDOWN = 1000;
-    public static final int CAR_WIDTH = 30;
+    public static final int CAR_WIDTH = 20;
+    public static final boolean REPAIR_BROKEN_CAR = false;
 
     public static final int MAX_NORMAL_CAR_SPEED = 8;
     public static final int MAX_FAST_CAR_SPEED = 11;

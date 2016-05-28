@@ -107,6 +107,9 @@ public abstract class Car {
             }
         }
 
+        // if no solution found, decelerate as much as possible and stay at the same lane.
+        speed = minimumPosition - position;
+        position = Math.floorMod(minimumPosition, TrafficSimulation.ROAD_SIZE);
         return false;
     }
 
@@ -124,19 +127,28 @@ public abstract class Car {
     private boolean prevCarIsFarEnough(int nextPosition, int prevCarPos, int prevCarSpeed) {
         if (prevCarPos == -1) return true;
 
-        int worstCaseGap;
-        int minFutureGap = Math.floorDiv(prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION, TrafficSimulation.GLOBAL_MINIMUM_DECELERATION) + 1;
+        int worstCaseGap, moves, minFutureGap, futurePrevCarSpeed, prevCarDeceleration;
+
+        // version 1 - reject because it's too small sometimes and creates conflict (we haven't calculated gap properly
+//        int minFutureGap = Math.floorDiv(prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION, TrafficSimulation.GLOBAL_MINIMUM_DECELERATION) + 1;
+        //version 2 - reject because makes the cars queue (requires too big a gap)
+//        prevCarDeceleration = TrafficSimulation.GLOBAL_MINIMUM_DECELERATION; // worst case senario
+//        futurePrevCarSpeed = prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION; // worst case senario
+//        moves = Math.floorDiv(futurePrevCarSpeed+1, prevCarDeceleration); // moves required for full stop (worst case senario)
+//        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * prevCarDeceleration + 1; // minimum gap so that no crashes occur (maximumDeceleration of the current car)
+//
+        // version 3 - ignorant cars think all the other cars are like them - does not cause conflicts, but slow cars queue (and all cars wait for a long time)
+        futurePrevCarSpeed = prevCarSpeed + maximumAcceleration;
+        moves = Math.floorDiv(futurePrevCarSpeed + 1, maximumDeceleration);
+        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;
 
         if (prevCarPos > position) //comes full circle
             worstCaseGap = nextPosition - (prevCarPos + prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION - TrafficSimulation.ROAD_SIZE);
         else
             worstCaseGap = nextPosition - (prevCarPos + prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION);
 
-        // check if the worst possible gap is at least as big as the minimum allowed gap
-        if (worstCaseGap >= minFutureGap)
-            return true;
-
-        return false;
+        // return true if the worst possible gap is at least as big as the minimum allowed gap
+        return worstCaseGap >= minFutureGap;
     }
 
     /**
@@ -160,26 +172,26 @@ public abstract class Car {
             return true;
         }
 
-        int futureNextCarPos, minFutureGap, worstCaseGap;
+        int futureNextCarPos, minFutureGap, worstCaseGap, moves;
         futureNextCarPos = nextCarPos + nextCarSpeed - TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION; // worst case senario
-        minFutureGap = Math.floorDiv(nextSpeed, maximumDeceleration) + 1; // minimum gap so that no crashes occur (maximumDeceleration of the current car)
+//        minFutureGap = Math.floorDiv(nextSpeed, maximumDeceleration) + 1; // minimum gap so that no crashes occur (maximumDeceleration of the current car)
+        moves = Math.floorDiv(nextSpeed + 1, maximumDeceleration); // moves required for full stop
+        minFutureGap = moves * nextSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1; // minimum gap so that no crashes occur (maximumDeceleration of the current car)
+        // ((moves - 1) * moves) / 2 is 1+2+...+k = k*(k+1)/2 where k = moves-1
 
         if (nextCarPos < position) //comes full circle
             worstCaseGap = futureNextCarPos + TrafficSimulation.ROAD_SIZE - nextPosition;
         else
             worstCaseGap = futureNextCarPos - nextPosition;
 
-        // check if the worst possible gap is at least as big as the minimum allowed gap
-        if (worstCaseGap >= minFutureGap) { // then moving there is possible
-            return true;
-        }
-
-        return false;
+        // return true if the worst possible gap is at least as big as the minimum allowed gap
+        return worstCaseGap >= minFutureGap;
     }
 
     private int getPositionOfNextCar(int[] lane, int current_pos) {
+        int correct_i;
         for (int i = current_pos + 1; i < TrafficSimulation.ROAD_SIZE + current_pos; i++) {
-            int correct_i = Math.floorMod(i, TrafficSimulation.ROAD_SIZE);
+            correct_i = Math.floorMod(i, TrafficSimulation.ROAD_SIZE);
             if (lane[correct_i] != -1) {
                 return correct_i;
             }
@@ -188,8 +200,9 @@ public abstract class Car {
     }
 
     private int getPositionOfPrevCar(int[] lane, int current_pos) {
+        int correct_i;
         for (int i = current_pos + TrafficSimulation.ROAD_SIZE; i > current_pos; i--) {
-            int correct_i = Math.floorMod(i, TrafficSimulation.ROAD_SIZE);
+            correct_i = Math.floorMod(i, TrafficSimulation.ROAD_SIZE);
             if (lane[correct_i] != -1) {
                 return correct_i;
             }
@@ -254,7 +267,7 @@ public abstract class Car {
         return speed;
     }
 
-    public void setSpeed(int speed) {
+    private void setSpeed(int speed) {
         this.speed = speed;
     }
 
@@ -309,18 +322,20 @@ public abstract class Car {
     public Color getColor() {
         return color;
     }
+    
+    private String getType(){
+        switch (this.getClass().toString()) {
+            case "class trafficsimulation.NormalCar":
+                return "N";
+            case "class trafficsimulation.FastCar":
+                return "F";
+        }
+        return "E";
+    }
 
     @Override
     public String toString() {
-        String str;
-        if (this.getClass().toString().equals("class trafficsimulation.NormalCar"))
-            str = "N ";
-        else if (this.getClass().toString().equals("class trafficsimulation.FastCar"))
-            str = "F ";
-        else
-            str = "E ";
-
-        return "(" + str + lane + "," + position + "," + speed + ") ";
+        return "(" + getType() + " " + lane + "," + position + "," + speed + ") ";
     }
 
 //                g.setColor(Color.blue);
