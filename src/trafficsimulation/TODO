@@ -15,7 +15,9 @@ package trafficsimulation;
 TODO: Troubleshoot car movement (message "car didn't move" appears, but it should never appear). (Kind of improved)
 TODO: Clear code. There are some weird things like THRESHOLD_OBEY_LAW that I have no clue where they came from. We also haven't discussed about how much (and which type(s) of) randomness we will add/keep.
 TODO: (unimportant) Add UI to control global conditions such as carWidth.
-TODO: Improve minimumGap calculation (especially for previous car).
+TODO: Improve minimumGap calculation (especially for previous car).   DONE (Hue)
+TODO: make TrafficSimulation called-able with construction having paramerers: density, road_size, running_time. When time is up, object returns flow over density. So we could evaluate model with a given road situation.
+TODO: make car move to right lane whenever possible (default by law)
 
 - calculate desired position:
     new desired position = prev_pos + speed + max_acc

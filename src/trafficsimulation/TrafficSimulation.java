@@ -1,12 +1,17 @@
 package trafficsimulation;
 
 public class TrafficSimulation {
-
-//    public static final int ROAD_SIZE = 150;
-    public static final int NUMBER_OF_NORMAL_CARS = 5;
-    public static final int NUMBER_OF_FAST_CARS = 5;
+    
+    public static final int ROAD_SIZE = 150;    // length of each lane
+    public static final double DENSITY = 0.1;    
+    
+//    public static final int NUMBER_OF_NORMAL_CARS = 5;
+//    public static final int NUMBER_OF_FAST_CARS = 5;
+    public static final int NUMBER_OF_NORMAL_CARS = (int)(DENSITY * ROAD_SIZE);
+    public static final int NUMBER_OF_FAST_CARS = (int)(DENSITY * ROAD_SIZE);
+    
     public static final int SIMULATION_STEP_COOLDOWN = 1000;
-    public static final int CAR_WIDTH = 20;
+    public static final int CAR_WIDTH = 10;
     public static final boolean REPAIR_BROKEN_CAR = false;
 
     public static final int MAX_NORMAL_CAR_SPEED = 8;
@@ -15,7 +20,8 @@ public class TrafficSimulation {
     public static final int GLOBAL_MINIMUM_DECELERATION = 1;
     public static final int GLOBAL_MAXIMUM_ACCELERATION = 2;
 
-    public static final int ROAD_SIZE = MAX_NORMAL_CAR_SPEED * NUMBER_OF_NORMAL_CARS + MAX_FAST_CAR_SPEED * NUMBER_OF_FAST_CARS;         // approx. number of cars x maximum speed
+    
+//    public static final int ROAD_SIZE = MAX_NORMAL_CAR_SPEED * NUMBER_OF_NORMAL_CARS + MAX_FAST_CAR_SPEED * NUMBER_OF_FAST_CARS;         // approx. number of cars x maximum speed
     public static final double THRESHOLD_OBEY_LAW = 0.2;   // greater is obeying law
 
     /**
