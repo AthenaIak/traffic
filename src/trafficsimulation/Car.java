@@ -139,8 +139,15 @@ public abstract class Car {
 //
         // version 3 - ignorant cars think all the other cars are like them - does not cause conflicts, but slow cars queue (and all cars wait for a long time)
         futurePrevCarSpeed = prevCarSpeed + maximumAcceleration;
-        moves = Math.floorDiv(futurePrevCarSpeed + 1, maximumDeceleration);
-        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;
+//        moves = Math.floorDiv(futurePrevCarSpeed + 1, maximumDeceleration); 
+        // should be
+        // moves = Math.ceilDiv(futurePrevCarSpeed, maximumDeceleration); OR
+         moves = - Math.floorDiv(-futurePrevCarSpeed, maximumDeceleration); // http://stackoverflow.com/questions/27643616/ceil-conterpart-for-math-floordiv-in-java
+        
+//        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;
+        minFutureGap = 0;
+        if (prevCarSpeed<speed)
+            minFutureGap = (int)(speed-prevCarSpeed)*moves + 1;
 
         if (prevCarPos > position) //comes full circle
             worstCaseGap = nextPosition - (prevCarPos + prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION - TrafficSimulation.ROAD_SIZE);
