@@ -144,10 +144,10 @@ public abstract class Car {
         // moves = Math.ceilDiv(futurePrevCarSpeed, maximumDeceleration); OR
          moves = - Math.floorDiv(-futurePrevCarSpeed, maximumDeceleration); // http://stackoverflow.com/questions/27643616/ceil-conterpart-for-math-floordiv-in-java
         
-//        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;
-        minFutureGap = 0;
-        if (prevCarSpeed<speed)
-            minFutureGap = (int)(speed-prevCarSpeed)*moves + 1;
+        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;
+//        minFutureGap = 0;
+//        if (prevCarSpeed<speed)
+//            minFutureGap = (int)(speed-prevCarSpeed)*moves + 1;
 
         if (prevCarPos > position) //comes full circle
             worstCaseGap = nextPosition - (prevCarPos + prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION - TrafficSimulation.ROAD_SIZE);
