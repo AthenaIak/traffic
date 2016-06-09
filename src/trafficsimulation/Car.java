@@ -23,35 +23,36 @@ import java.util.Random;
  */
 public abstract class Car {
 
-    protected int ID;
     protected int speed; // current
     protected int lane; // current
     protected int position; // current
-    protected boolean leftBlinker;
-    protected boolean rightBlinker;
     protected int maximumSpeed;
     protected int maximumAcceleration;
     protected int maximumDeceleration;
     protected Color color;
-
     protected int traveledDistance;
 
-    public Car(int ID, int speed, int lane, int position) {
-        this.ID = ID;
+    /**
+     * Creates a car.
+     * @param speed The current speed of the car.
+     * @param lane The current lane of the car.
+     * @param position The current position of the car.
+     */
+    public Car(int speed, int lane, int position) {
         this.speed = speed;
         this.lane = lane;
         this.position = position;
-        this.leftBlinker = false;
-        this.rightBlinker = false;
+        this.traveledDistance = 0;
     }
 
-    // see FastCar.java, NormalCar.java
-    public Car(int ID, int lane, int position) {
-        this.ID = ID;
+    /**
+     * Creates a car.
+     * @param lane The current lane of the car.
+     * @param position The current position of the car.
+     */
+    public Car(int lane, int position) {
         this.lane = lane;
         this.position = position;
-        this.leftBlinker = false;
-        this.rightBlinker = false;
         this.traveledDistance = 0;
     }
 
@@ -90,7 +91,6 @@ public abstract class Car {
             if (nextCarIsFarEnough(nextPosition, nextSpeed, nextCarSameLpos, nextCarSameLspeed)) {
                 position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE); // nextPosition is now rounded to road size
                 speed = nextSpeed;
-                // lane = lane;
                 return true;
             }
 
@@ -122,33 +122,22 @@ public abstract class Car {
      * now.
      * @param prevCarSpeed Speed of the previous car (different lane) right now
      * (cells it covered with its previous move).
-     * @return
+     * @return True if the car behind is far enough (or false if it isn't).
      */
     private boolean prevCarIsFarEnough(int nextPosition, int prevCarPos, int prevCarSpeed) {
         if (prevCarPos == -1) return true;
 
         int worstCaseGap, moves, minFutureGap, futurePrevCarSpeed, prevCarDeceleration;
 
-        // version 1 - reject because it's too small sometimes and creates conflict (we haven't calculated gap properly
-//        int minFutureGap = Math.floorDiv(prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION, TrafficSimulation.GLOBAL_MINIMUM_DECELERATION) + 1;
-        //version 2 - reject because makes the cars queue (requires too big a gap)
-//        prevCarDeceleration = TrafficSimulation.GLOBAL_MINIMUM_DECELERATION; // worst case senario
-//        futurePrevCarSpeed = prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION; // worst case senario
-//        moves = Math.floorDiv(futurePrevCarSpeed+1, prevCarDeceleration); // moves required for full stop (worst case senario)
-//        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * prevCarDeceleration + 1; // minimum gap so that no crashes occur (maximumDeceleration of the current car)
-//
-        // version 3 - ignorant cars think all the other cars are like them - does not cause conflicts, but slow cars queue (and all cars wait for a long time)
+        // ignorant cars think all the other cars are like them - does not cause conflicts, but slow cars queue (and all cars wait for a long time)
         futurePrevCarSpeed = prevCarSpeed + maximumAcceleration;
-//        moves = Math.floorDiv(futurePrevCarSpeed + 1, maximumDeceleration); 
-        // should be
-        // moves = Math.ceilDiv(futurePrevCarSpeed, maximumDeceleration); OR
-         moves = - Math.floorDiv(-futurePrevCarSpeed, maximumDeceleration); // http://stackoverflow.com/questions/27643616/ceil-conterpart-for-math-floordiv-in-java
-        
-        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;
-//        minFutureGap = 0;
-//        if (prevCarSpeed<speed)
-//            minFutureGap = (int)(speed-prevCarSpeed)*moves + 1;
 
+        // count the number of moves that are required for the car behind to come to full stop
+        moves = -Math.floorDiv(-futurePrevCarSpeed, maximumDeceleration); // http://stackoverflow.com/questions/27643616/ceil-conterpart-for-math-floordiv-in-java
+        // calculate the number of cells required for the car behind to come to full stop (and add 1 extra cell)
+        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration +1;  // ((moves - 1) * moves) / 2 is 1+2+...+k = k*(k+1)/2 where k = moves-1
+
+        // minFutureGap is the minimum allowed gap. worstCaseGap is actual gap between the two cars, if *this* car performs the eximined move.
         if (prevCarPos > position) //comes full circle
             worstCaseGap = nextPosition - (prevCarPos + prevCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_ACCELERATION - TrafficSimulation.ROAD_SIZE);
         else
@@ -168,24 +157,25 @@ public abstract class Car {
      * @param nextCarPos Position of the next car right now.
      * @param nextCarSpeed Speed of the next car right now (cells it covered
      * with its previous move).
-     * @return
+     * @return True if the car in front is far enough (or false if it isn't).
      */
     private boolean nextCarIsFarEnough(int nextPosition, int nextSpeed, int nextCarPos, int nextCarSpeed) {
 
         if (nextCarPos == -1) { // there is no other car on the lane, so moving is possible
             position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE);
             speed = nextSpeed;
-            // lane = lane;
             return true;
         }
 
         int futureNextCarPos, minFutureGap, worstCaseGap, moves;
         futureNextCarPos = nextCarPos + nextCarSpeed - TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION; // worst case senario
-//        minFutureGap = Math.floorDiv(nextSpeed, maximumDeceleration) + 1; // minimum gap so that no crashes occur (maximumDeceleration of the current car)
-        moves = Math.floorDiv(nextSpeed + 1, maximumDeceleration); // moves required for full stop
-        minFutureGap = moves * nextSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1; // minimum gap so that no crashes occur (maximumDeceleration of the current car)
-        // ((moves - 1) * moves) / 2 is 1+2+...+k = k*(k+1)/2 where k = moves-1
+        
+        // count the number of moves that are required for the car infront to come to full stop
+        moves = -Math.floorDiv(-nextSpeed, maximumDeceleration);
+        // calculate the number of cells required for the car infront to come to full stop
+        minFutureGap = moves * nextSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;
 
+        // minFutureGap is the minimum allowed gap. worstCaseGap is actual gap between the two cars, if *this* car performs the eximined move.
         if (nextCarPos < position) //comes full circle
             worstCaseGap = futureNextCarPos + TrafficSimulation.ROAD_SIZE - nextPosition;
         else
@@ -195,6 +185,12 @@ public abstract class Car {
         return worstCaseGap >= minFutureGap;
     }
 
+    /**
+     * Finds the position of the car directly in front of the specified position, on the specified lane.
+     * @param lane The lane that will be checked.
+     * @param current_pos The position of "this" car.
+     * @return The index of the car in the lane array, or -1 if no car exists.
+     */
     private int getPositionOfNextCar(int[] lane, int current_pos) {
         int correct_i;
         for (int i = current_pos + 1; i < TrafficSimulation.ROAD_SIZE + current_pos; i++) {
@@ -206,6 +202,12 @@ public abstract class Car {
         return -1;
     }
 
+    /**
+     * Finds the position of the car directly behind (or in parallel) of the specified position, on the specified lane.
+     * @param lane The lane that will be checked.
+     * @param current_pos The position of "this" car.
+     * @return The index of the car in the lane array, or -1 if no car exists.
+     */
     private int getPositionOfPrevCar(int[] lane, int current_pos) {
         int correct_i;
         for (int i = current_pos + TrafficSimulation.ROAD_SIZE; i > current_pos; i--) {
@@ -216,56 +218,14 @@ public abstract class Car {
         }
         return -1;
     }
-
-//    /**
-//     * This method adjusts the speed of the current car,
-//     * depending of the distance to and the speed of the car in front.
-//     *
-//     * @param distance_to_next : distance to car in front.
-//     * @param speed_of_next : speed in car in front.
-//     */
-//    public int adaptSpeed(int distance_to_next, int speed_of_next) {
-//        //We need to decelerate
-//        if (speed_of_next < speed) {
-//
-//            //In this timestep there is enough room, but we may only assume ther isn't in the next.
-//            //If the speed difference is too big, we need to start decelerating now.
-//            if (distance_to_next == speed && (speed - speed_of_next) > maximumDeceleration) {
-//                speed -= Math.min(maximumDeceleration, speed - speed_of_next - maximumDeceleration);
-//            } //There is already too little room now, so we need to decelerate.
-//            else if (distance_to_next < speed) {
-//                speed -= Math.min(maximumDeceleration, speed - speed_of_next);
-//            }
-//
-//        } // The car in front is driving faster than this car.
-//        else if (speed_of_next > speed) {
-//            //The distance to the next car is within the limit, but it will expand.
-//            //If it expands enough, we may accelerate.
-//            if (speed <= distance_to_next) {
-//                speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, (distance_to_next + (speed_of_next - speed)) - speed));
-//            } // The distance to the next car is greater than our speed; we may accelerate
-//            else {
-//                //The car may only accelerate if the gap created by the speed difference is at least as big as the speed.
-//                if (speed_of_next - speed + distance_to_next > speed) {
-//                    speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, speed_of_next - speed_of_next + distance_to_next));
-//                }
-//            }
-//        } else {
-//            //speed of two cars is equal. Only if the distance between the both is large enough, the car may accelerate.
-//            if (speed < distance_to_next) {
-//                //the car is allowed to accelerate if it is not driving at maximum speed already.
-//                //the maximum amount of acceleration is determined both by the physical limits of the car and the
-//                //distance to the car ahead.
-//                speed += Math.min(maximumSpeed - speed, Math.min(maximumAcceleration, distance_to_next - speed));
-//            }
-//        }
-//
-//        return speed;
-//    }
-    public int getID() {
-        return ID;
+    
+    /**
+     * Zeros the traveled distance.
+     */
+    public void clearTraveledDistance(){
+        traveledDistance = 0;
     }
-
+    
     public int getTraveledDistance() {
         return traveledDistance;
     }
@@ -274,63 +234,19 @@ public abstract class Car {
         return speed;
     }
 
-    private void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
     public int getLane() {
         return lane;
-    }
-
-    public void switchLane() {
-        lane = Math.floorMod(2 * lane, 3);
     }
 
     public int getPosition() {
         return position;
     }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public void setLane(int lane) {
-        this.lane = lane;
-    }
-
-    public boolean isLeftBlinkerOn() {
-        return leftBlinker;
-    }
-
-    public void setLeftBlinker(boolean leftBlinker) {
-        this.leftBlinker = leftBlinker;
-    }
-
-    public boolean isRightBlinkerOn() {
-        return rightBlinker;
-    }
-
-    public void setRightBlinker(boolean rightBlinker) {
-        this.rightBlinker = rightBlinker;
-    }
-
-    public int getMaximumAcceleration() {
-        return maximumAcceleration;
-    }
-
-    public int getMaximumDeceleration() {
-        return maximumDeceleration;
-    }
-
-    public int getMaximumSpeed() {
-        return maximumSpeed;
-    }
-
+    
     public Color getColor() {
         return color;
     }
-    
-    private String getType(){
+
+    private String getType() {
         switch (this.getClass().toString()) {
             case "class trafficsimulation.NormalCar":
                 return "N";
@@ -344,7 +260,4 @@ public abstract class Car {
     public String toString() {
         return "(" + getType() + " " + lane + "," + position + "," + speed + ") ";
     }
-
-//                g.setColor(Color.blue);
-//            else if (c.getClass().toString().equals("class trafficsimulation.FastCar"))
 }

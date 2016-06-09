@@ -1,11 +1,9 @@
-package trafficsimulation;
-
 /**
  * Created by oschnitzeler on 5/17/16.
  *
- * TODO: Change order of adapting speed <-> setting new position in Road.java - Athena (I will generally work on the new "move car" calculations)
- * TODO: Incorporate gap in calculation of new desired speed  - Athena
- * TODO: Implement iterative way of finding new speed for next time step. (desired position) - Athena 
+ * TODO: Change order of adapting speed <-> setting new position in Road.java - Athena (Done)
+ * TODO: Incorporate gap in calculation of new desired speed  - Athena (Done)
+ * TODO: Implement iterative way of finding new speed for next time step. (desired position) - Athena  (Done)
  * TODO: Compare rules from the article by Vasic et al. to our set
  * TODO: Find proper way to generate the initial traffic situation.  - Hue - DONE, see commits in my branch
  * TODO: Make the loop to move car in Road.nextState() become randomly moving, not sequential as current, so the car which is moved first will have priority in choosing new position on road - Hue's suggestion. Athena: I disagree; we should make it work parallel.
@@ -13,11 +11,34 @@ package trafficsimulation;
 
 (Athena):
 TODO: Troubleshoot car movement (message "car didn't move" appears, but it should never appear). (Kind of improved)
-TODO: Clear code. There are some weird things like THRESHOLD_OBEY_LAW that I have no clue where they came from. We also haven't discussed about how much (and which type(s) of) randomness we will add/keep.
-TODO: (unimportant) Add UI to control global conditions such as carWidth.
-TODO: Improve minimumGap calculation (especially for previous car).
-TODO: make TrafficSimulation called-able with construction having paramerers: density, road_size, running_time. When time is up, object returns flow over density. So we could evaluate model with a given road situation.
-TODO: make car move to right lane whenever possible (default by law)
+TODO: Clear code. There are some weird things like THRESHOLD_OBEY_LAW that I have no clue where they came from. We also haven't discussed about how much (and which type(s) of) randomness we will add/keep. - Athena (Done)
+TODO: Improve minimumGap calculation (especially for previous car). (Done)
+TODO: make TrafficSimulation called-able with construction having paramerers: density, road_size, running_time. When time is up, object returns flow over density. So we could evaluate model with a given road situation. - Partially done (Athena)
+(revoked) TODO: make car move to right lane whenever possible (default by law)
+
+Athena 9/6/16:
+CHANGES:
+- renamed Animation to AnimatedSimulation
+- cleared code: deleted commented and unused code, added comments, made everything as private as necessary.
+- cleared project folder (deleted minimum gap doc and presentation folder).
+- split global variables to two categories: Constants (final fields) and Configurations (we will play with these values for the simulation).
+- improved main method. Instead of just creating an AnimatedSimulation object, now we can create and have control over it through the main method. Configurations are also initiated inside this method.
+- when simulation is initiated, 10 states are skipped (and the traveled distance of all cars is zeroed).
+- all broken car probabilities are specified using global constants. If breaking probability = 0 then no broken car is generated.
+- added FAST_CAR_RATIO configuration.
+- half the cars are now generated using the density value. The density value used to show density/lane and now is density/road (2 lanes).
+- removed randomisation of maximum speed for all cars.
+- improved printTrafficSituation/toHex (renamed as toSymbol) for speed/clarity.
+
+NEW OBJECTIVES:
+TODO: Implement a global rule that enforces a maximum speed difference between the two lanes.
+TODO: Implement method getStatistics (in class Road) to measure the traffic flow. getStatistics may call other private functions that calculate more specific statistics.
+    from Olivier's email: 
+        3a. Method to measure the general flow, i.e. the number of cars that pass a certain point per X iterations (=~ the average time it takes one car to travel 100 cells).
+        3b. Method to measure individual car performance. We expect the slow cars to travel less, since they merge worse than the fast cars in the current model. These methods should measure the average speed of each individual car for the duration of the simulation.
+        3c. Make sure that the stats after the initialization has stabilized (i.e. no more errors for the first time since initialization). 
+
+
 
 - calculate desired position:
     new desired position = prev_pos + speed + max_acc

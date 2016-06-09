@@ -8,13 +8,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-final public class Animation {
+final public class AnimatedSimulation {
 
     private final Road road = new Road();
     private static final int cooldown = TrafficSimulation.SIMULATION_STEP_COOLDOWN; //cooldown between steps of the simulation
-    private int carWidth = TrafficSimulation.CAR_WIDTH;
-    private int carHeight = 10;
-    private int numRuns = 0;
+    private final int carWidth = TrafficSimulation.CAR_WIDTH;
+    private final int carHeight = 10;
+    private int numRuns;
 
     private JFrame frame;
     private DrawPanel drawPanel;
@@ -22,12 +22,16 @@ final public class Animation {
     /**
      * This method initialises and performs the simulation.
      */
-    public void runSimulation() {
+    public void initialiseSimulation() {
         // set window title and stop running if X is pressed
         frame = new JFrame("Simulation");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // initialise the simulation
+        for (int i = 0; i < 10; i++) // skip the first states
+            road.nextState();
+        for(Car c: road.getCars())
+            c.clearTraveledDistance();
         road.printTrafficSituation();
 
         // create a panel that will contain the painting
@@ -39,28 +43,26 @@ final public class Animation {
         // put the painting panel inside the scrollable panel
         jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
-        //TODO(optional): add UI.
         // put everything on the frame
         frame.getContentPane().add(BorderLayout.CENTER, jsp);
         frame.setResizable(true);
         frame.setSize(2000, 400);
         frame.setLocationByPlatform(true);
         frame.setVisible(true);
-
-        // start the simulation
-        moveIt();
     }
 
     /**
-     * Loops forever, moving from the current to the next state of the
-     * simulation.
+     * Continuously calculates and presents the next state.
+     * @param numberOfIterations The number of states the simulation will run for. If 0, then it never stops running.
      */
-    private void moveIt() {
-        while (true) {
+    public void runSimulation(int numberOfIterations) {
+        numRuns = 0;
+
+        while (numberOfIterations == 0 || numRuns < numberOfIterations) {
             numRuns++;
 
-            road.nextState();
-            frame.repaint(); // calls paintComponent(g)
+            road.nextState(); // calculates the next state
+            frame.repaint(); // calls paintComponent(g) to draw the new state
             road.printTrafficSituation();
 
             // print the current flow every 100 iterations
@@ -79,9 +81,7 @@ final public class Animation {
      * Helper panel used to draw the animation. Translates the current data
      * about the cars on the road to an image.
      */
-    class DrawPanel extends JPanel {
-
-        private static final long serialVersionUID = 1L;
+    private class DrawPanel extends JPanel {
 
         public void paintComponent(Graphics g) {
             setBackground(new Color(240, 240, 185));
@@ -98,8 +98,7 @@ final public class Animation {
 
             //Draw all cars as color filled round rectangles.
             for (Car c : road.getCars()) {
-                // individual colour for each car
-                g.setColor(c.getColor());
+                g.setColor(c.getColor()); // individual colour for each car
                 if (c.getLane() == 1)
                     g.fillRoundRect(c.getPosition() * carWidth, 117, carWidth - 5, carHeight, 2, 2);
                 if (c.getLane() == 2)

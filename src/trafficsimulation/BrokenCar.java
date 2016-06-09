@@ -5,24 +5,37 @@ import java.util.Random;
 
 public class BrokenCar extends Car {
 
-    private double breakDownProb = 0.05;
-    private double getFixedProb = 0.05;
+    private final double breakDownProb = TrafficSimulation.BREAKING_DOWN_PROBABILITY;
+    private final double getFixedProb = TrafficSimulation.GETTING_REPAIRED_PROBABILITY;
     private boolean isBrokenDown;
     private Random r;
 
-    public BrokenCar(int ID, int speed, int lane, int position, double breakDownProb) {
-        super(ID, speed, lane, position);
+    /**
+     * Creates a car. Decides speed randomly.
+     * @param speed The current speed of the car.
+     * @param lane The current lane of the car.
+     * @param position The current position of the car.
+     */
+    public BrokenCar(int speed, int lane, int position) {
+        super(speed, lane, position); // calls the parent constructor
 
-        maximumSpeed = 4;
+        maximumSpeed = TrafficSimulation.MAX_NORMAL_CAR_SPEED;
         maximumAcceleration = 1;
-        maximumDeceleration = 1;
-        this.breakDownProb = breakDownProb;
+        maximumDeceleration = TrafficSimulation.GLOBAL_MINIMUM_DECELERATION;
         isBrokenDown = false;
 
         r = new Random();
         color = new Color(0, 255, 0);
     }
 
+    /**
+     * Moves if it is not currently broken. If broken, it decelerates until it
+     * stops. It remains stopped until it is repaired (then it moves normally
+     * again).
+     * @param l1 Right lane.
+     * @param l2 Left lane.
+     * @return True if it moved (or remained stopped) without a conflict.
+     */
     @Override
     public boolean move(int[] l1, int[] l2) {
         boolean moved;
@@ -39,7 +52,7 @@ public class BrokenCar extends Car {
         if (rand < breakDownProb) // car breaks down with a small probability
             isBrokenDown = true;
 
-        if (TrafficSimulation.REPAIR_BROKEN_CAR && rand > 1 - getFixedProb) // car gets fixed with a small probability
+        if (getFixedProb > 0 && rand > 1 - getFixedProb) // car gets fixed with a small probability
             isBrokenDown = false;
 
         return moved;
