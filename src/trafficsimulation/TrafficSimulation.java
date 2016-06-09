@@ -33,8 +33,8 @@ public class TrafficSimulation {
         MAX_NORMAL_CAR_SPEED = 8;
         MAX_FAST_CAR_SPEED = 11;
         FAST_CAR_RATIO = 0.25;
-        NUMBER_OF_NORMAL_CARS = (int) (DENSITY * ROAD_SIZE * (1 - FAST_CAR_RATIO));
-        NUMBER_OF_FAST_CARS = (int) (DENSITY * ROAD_SIZE * FAST_CAR_RATIO);
+        NUMBER_OF_NORMAL_CARS = (int) (DENSITY * 2 * ROAD_SIZE * (1 - FAST_CAR_RATIO));
+        NUMBER_OF_FAST_CARS = (int) (DENSITY * 2 * ROAD_SIZE * FAST_CAR_RATIO);
 
         AnimatedSimulation simulation = new AnimatedSimulation();
         simulation.initialiseSimulation();

@@ -135,7 +135,7 @@ public abstract class Car {
         // count the number of moves that are required for the car behind to come to full stop
         moves = -Math.floorDiv(-futurePrevCarSpeed, maximumDeceleration); // http://stackoverflow.com/questions/27643616/ceil-conterpart-for-math-floordiv-in-java
         // calculate the number of cells required for the car behind to come to full stop (and add 1 extra cell)
-        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration +1;  // ((moves - 1) * moves) / 2 is 1+2+...+k = k*(k+1)/2 where k = moves-1
+        minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;  // ((moves - 1) * moves) / 2 is 1+2+...+k = k*(k+1)/2 where k = moves-1
 
         // minFutureGap is the minimum allowed gap. worstCaseGap is actual gap between the two cars, if *this* car performs the eximined move.
         if (prevCarPos > position) //comes full circle
@@ -169,7 +169,7 @@ public abstract class Car {
 
         int futureNextCarPos, minFutureGap, worstCaseGap, moves;
         futureNextCarPos = nextCarPos + nextCarSpeed - TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION; // worst case senario
-        
+
         // count the number of moves that are required for the car infront to come to full stop
         moves = -Math.floorDiv(-nextSpeed, maximumDeceleration);
         // calculate the number of cells required for the car infront to come to full stop
@@ -186,7 +186,8 @@ public abstract class Car {
     }
 
     /**
-     * Finds the position of the car directly in front of the specified position, on the specified lane.
+     * Finds the position of the car directly in front of the specified
+     * position, on the specified lane.
      * @param lane The lane that will be checked.
      * @param current_pos The position of "this" car.
      * @return The index of the car in the lane array, or -1 if no car exists.
@@ -203,7 +204,8 @@ public abstract class Car {
     }
 
     /**
-     * Finds the position of the car directly behind (or in parallel) of the specified position, on the specified lane.
+     * Finds the position of the car directly behind (or in parallel) of the
+     * specified position, on the specified lane.
      * @param lane The lane that will be checked.
      * @param current_pos The position of "this" car.
      * @return The index of the car in the lane array, or -1 if no car exists.
@@ -218,14 +220,14 @@ public abstract class Car {
         }
         return -1;
     }
-    
+
     /**
      * Zeros the traveled distance.
      */
-    public void clearTraveledDistance(){
+    public void clearTraveledDistance() {
         traveledDistance = 0;
     }
-    
+
     public int getTraveledDistance() {
         return traveledDistance;
     }
@@ -241,7 +243,7 @@ public abstract class Car {
     public int getPosition() {
         return position;
     }
-    
+
     public Color getColor() {
         return color;
     }

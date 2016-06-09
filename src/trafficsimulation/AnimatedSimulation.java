@@ -30,7 +30,7 @@ final public class AnimatedSimulation {
         // initialise the simulation
         for (int i = 0; i < 10; i++) // skip the first states
             road.nextState();
-        for(Car c: road.getCars())
+        for (Car c : road.getCars())
             c.clearTraveledDistance();
         road.printTrafficSituation();
 
@@ -53,7 +53,8 @@ final public class AnimatedSimulation {
 
     /**
      * Continuously calculates and presents the next state.
-     * @param numberOfIterations The number of states the simulation will run for. If 0, then it never stops running.
+     * @param numberOfIterations The number of states the simulation will run
+     * for. If 0, then it never stops running.
      */
     public void runSimulation(int numberOfIterations) {
         numRuns = 0;

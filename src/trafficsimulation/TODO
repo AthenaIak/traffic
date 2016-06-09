@@ -26,7 +26,7 @@ CHANGES:
 - when simulation is initiated, 10 states are skipped (and the traveled distance of all cars is zeroed).
 - all broken car probabilities are specified using global constants. If breaking probability = 0 then no broken car is generated.
 - added FAST_CAR_RATIO configuration.
-- half the cars are now generated using the density value. The density value used to show density/lane and now is density/road (2 lanes).
+- (revoked: half the cars are now generated using the density value. The density value used to show density/lane and now is density/road (2 lanes)) - I wrongly assumed that.
 - removed randomisation of maximum speed for all cars.
 - improved printTrafficSituation/toHex (renamed as toSymbol) for speed/clarity.
 

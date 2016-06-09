@@ -3,7 +3,7 @@ package trafficsimulation;
 import java.awt.Color;
 import java.util.Random;
 
-public class NormalCar extends Car{
+public class NormalCar extends Car {
 
     /**
      * Creates a car.
@@ -17,11 +17,11 @@ public class NormalCar extends Car{
         maximumSpeed = TrafficSimulation.MAX_NORMAL_CAR_SPEED;
         maximumAcceleration = 1;
         maximumDeceleration = TrafficSimulation.GLOBAL_MINIMUM_DECELERATION;
-        
+
         Random r = new Random();
         color = new Color(r.nextInt(130), r.nextInt(130), 255);
     }
-    
+
     /**
      * Creates a car. Decides speed randomly.
      * @param lane The current lane of the car.
@@ -30,7 +30,7 @@ public class NormalCar extends Car{
     public NormalCar(int lane, int position) {
         super(lane, position);
         Random r = new Random();
-        
+
         // make max_speed of car not always the same
 //        if (r.nextFloat()<0.5){
 //            maximumSpeed = TrafficSimulation.MAX_NORMAL_CAR_SPEED - 1;
@@ -43,8 +43,8 @@ public class NormalCar extends Car{
 
         maximumAcceleration = 1;
         maximumDeceleration = TrafficSimulation.GLOBAL_MINIMUM_DECELERATION;
-        
+
         color = new Color(0, r.nextInt(130), 255);
     }
-    
+
 }

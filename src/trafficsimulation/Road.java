@@ -105,24 +105,24 @@ public class Road {
      */
     public void printTrafficSituation() {
         String traffic_l1 = "|", traffic_l2 = "|";
-        
-        for (int i = 0; i < l1.length; i++){
+
+        for (int i = 0; i < l1.length; i++) {
             traffic_l1 += toSymbol(l1[i]);
             traffic_l2 += toSymbol(l2[i]);
         }
 
         traffic_l1 += "|";
         traffic_l2 += "|";
-        
+
         System.out.println(traffic_l1 + "\n" + traffic_l2 + "\n");
     }
-    
+
     /**
      * Calculates all the statistics for the simulation.
      * @param numIterations The number of states the simulation has.
      * @return The statistics of the simulation.
      */
-    public String getStatistics(int numIterations){
+    public String getStatistics(int numIterations) {
         //TODO implement this method! (calculate flows etc)
         return "not implemented yet";
     }
@@ -138,7 +138,7 @@ public class Road {
     }
 
     /**
-     * 
+     *
      * @return The list of cars in the road.
      */
     public ArrayList<Car> getCars() {
