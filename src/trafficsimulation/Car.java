@@ -2,6 +2,7 @@ package trafficsimulation;
 
 import java.awt.Color;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 /*
  speed: 
@@ -31,18 +32,24 @@ public abstract class Car {
     protected int maximumDeceleration;
     protected Color color;
     protected int traveledDistance;
+    
+    protected int[] speedLog;
+    protected int numIterations = 0;
+    protected int maxReachedSpeed = -1;
 
     /**
      * Creates a car.
      * @param speed The current speed of the car.
      * @param lane The current lane of the car.
      * @param position The current position of the car.
+     * @param logLength The number of iterations
      */
-    public Car(int speed, int lane, int position) {
+    public Car(int speed, int lane, int position, int logLength) {
         this.speed = speed;
         this.lane = lane;
         this.position = position;
         this.traveledDistance = 0;
+        this.speedLog = new int[logLength];
     }
 
     /**
@@ -50,10 +57,11 @@ public abstract class Car {
      * @param lane The current lane of the car.
      * @param position The current position of the car.
      */
-    public Car(int lane, int position) {
+    public Car(int lane, int position, int logLength) {
         this.lane = lane;
         this.position = position;
         this.traveledDistance = 0;
+        this.speedLog = new int[logLength];
     }
 
     /**
@@ -65,52 +73,68 @@ public abstract class Car {
      */
     public boolean move(int[] l1, int[] l2) {
         this.traveledDistance += speed;
-        int desiredPosition = speed + maximumAcceleration < maximumSpeed ? position + speed + maximumAcceleration : position + maximumSpeed;
-        int minimumPosition = speed - maximumDeceleration > 0 ? position + speed - maximumDeceleration : position;
-
-        // retrieve neighborhood info (position and speed of the 3 important neighbors)
-        int nextCarSameLpos = getPositionOfNextCar(lane == 1 ? l1 : l2, position);
-        int nextCarDiffLpos = getPositionOfNextCar(lane == 1 ? l2 : l1, position);
-        int prevCarDiffLpos = getPositionOfPrevCar(lane == 1 ? l2 : l1, position);
-        if (prevCarDiffLpos != -1) {
-            int prevCarDiffLspeed = lane == 1 ? l2[prevCarDiffLpos] : l1[prevCarDiffLpos];
+        if (numIterations < speedLog.length) {
+            speedLog[numIterations] = speed;
+            numIterations++; 
         }
-
-        int nextCarSameLspeed, nextCarDiffLspeed, nextSpeed;
-
-        Random r = new Random();
-        if (lane == 1 && r.nextDouble() < 0.5) desiredPosition--;
-        if (lane == 2 && r.nextDouble() < 0.05) desiredPosition--;
-
-        // iterate through all possible positions (starting from the most desired)
-        for (int nextPosition = desiredPosition; nextPosition >= minimumPosition; nextPosition--) { //nextPosition is not rounded to road size yet
-            nextSpeed = nextPosition - position;
-
-            // check if this position is possible for the current lane
-            nextCarSameLspeed = nextCarSameLpos == -1 ? -1 : lane == 1 ? l1[nextCarSameLpos] : l2[nextCarSameLpos];
-            if (nextCarIsFarEnough(nextPosition, nextSpeed, nextCarSameLpos, nextCarSameLspeed)) {
-                position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE); // nextPosition is now rounded to road size
-                speed = nextSpeed;
-                return true;
+        maxReachedSpeed = maxReachedSpeed < speed ? speed : maxReachedSpeed;
+        
+        //If global max speed holds, stick to that. Otherwise, do as you do.
+        int desiredPosition;
+        if (TrafficSimulation.GLOBAL_SPEED_RULE) {
+            if (speed >= TrafficSimulation.GLOBAL_MAX_SPEED) {
+                desiredPosition = position + speed - Math.min(maximumDeceleration, speed - TrafficSimulation.GLOBAL_MAX_SPEED);
+            } else{ 
+                desiredPosition = speed + maximumAcceleration < TrafficSimulation.GLOBAL_MAX_SPEED ? position + speed + maximumAcceleration : position + TrafficSimulation.GLOBAL_MAX_SPEED;
+            }
+        } else {
+            desiredPosition = speed + maximumAcceleration < maximumSpeed ? position + speed + maximumAcceleration : position + maximumSpeed;
+        }
+        int minimumPosition = speed - maximumDeceleration > 0 ? position + speed - maximumDeceleration : position;
+        
+        // retrieve neighborhood info (position and speed of the 3 important neighbors)
+            int nextCarSameLpos = getPositionOfNextCar(lane == 1 ? l1 : l2, position);
+            int nextCarDiffLpos = getPositionOfNextCar(lane == 1 ? l2 : l1, position);
+            int prevCarDiffLpos = getPositionOfPrevCar(lane == 1 ? l2 : l1, position);
+            if (prevCarDiffLpos != -1) {
+                int prevCarDiffLspeed = lane == 1 ? l2[prevCarDiffLpos] : l1[prevCarDiffLpos];
             }
 
-            // check if this position is possible for the other lane
-            int prevCarDiffLspeed = prevCarDiffLpos == -1 ? -1 : lane == 1 ? l2[prevCarDiffLpos] : l1[prevCarDiffLpos];
-            if (prevCarIsFarEnough(nextPosition, prevCarDiffLpos, prevCarDiffLspeed)) { // then check if next car (diff lane) is far enough
-                nextCarDiffLspeed = nextCarDiffLpos == -1 ? -1 : lane == 1 ? l2[nextCarDiffLpos] : l1[nextCarDiffLpos];
-                if (nextCarIsFarEnough(nextPosition, nextSpeed, nextCarDiffLpos, nextCarDiffLspeed)) {
-                    position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE);
+            int nextCarSameLspeed, nextCarDiffLspeed, nextSpeed;
+
+            Random r = new Random();
+            if (lane == 1 && r.nextDouble() < 0.5) desiredPosition--;
+            if (lane == 2 && r.nextDouble() < 0.05) desiredPosition--;
+
+            // iterate through all possible positions (starting from the most desired)
+            for (int nextPosition = desiredPosition; nextPosition >= minimumPosition; nextPosition--) { //nextPosition is not rounded to road size yet
+                nextSpeed = nextPosition - position;
+
+                // check if this position is possible for the current lane
+                nextCarSameLspeed = nextCarSameLpos == -1 ? -1 : lane == 1 ? l1[nextCarSameLpos] : l2[nextCarSameLpos];
+                if (nextCarIsFarEnough(nextPosition, nextSpeed, nextCarSameLpos, nextCarSameLspeed)) {
+                    position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE); // nextPosition is now rounded to road size
                     speed = nextSpeed;
-                    lane = lane == 1 ? 2 : 1; // switch lane
                     return true;
                 }
-            }
-        }
 
-        // if no solution found, decelerate as much as possible and stay at the same lane.
-        speed = minimumPosition - position;
-        position = Math.floorMod(minimumPosition, TrafficSimulation.ROAD_SIZE);
-        return false;
+                // check if this position is possible for the other lane
+                int prevCarDiffLspeed = prevCarDiffLpos == -1 ? -1 : lane == 1 ? l2[prevCarDiffLpos] : l1[prevCarDiffLpos];
+                if (prevCarIsFarEnough(nextPosition, prevCarDiffLpos, prevCarDiffLspeed)) { // then check if next car (diff lane) is far enough
+                    nextCarDiffLspeed = nextCarDiffLpos == -1 ? -1 : lane == 1 ? l2[nextCarDiffLpos] : l1[nextCarDiffLpos];
+                    if (nextCarIsFarEnough(nextPosition, nextSpeed, nextCarDiffLpos, nextCarDiffLspeed)) {
+                        position = Math.floorMod(nextPosition, TrafficSimulation.ROAD_SIZE);
+                        speed = nextSpeed;
+                        lane = lane == 1 ? 2 : 1; // switch lane
+                        return true;
+                    }
+                }
+            }
+
+            // if no solution found, decelerate as much as possible and stay at the same lane.
+            speed = minimumPosition - position;
+            position = Math.floorMod(minimumPosition, TrafficSimulation.ROAD_SIZE);
+            return false;
     }
 
     /**
@@ -247,8 +271,16 @@ public abstract class Car {
     public Color getColor() {
         return color;
     }
+    
+    public int getMaxSpeed() {
+        return maxReachedSpeed;
+    }
+    
+    public int getTravelDistance() {
+        return traveledDistance;
+    }
 
-    private String getType() {
+    public String getType() {
         switch (this.getClass().toString()) {
             case "class trafficsimulation.NormalCar":
                 return "N";
@@ -263,3 +295,5 @@ public abstract class Car {
         return "(" + getType() + " " + lane + "," + position + "," + speed + ") ";
     }
 }
+
+

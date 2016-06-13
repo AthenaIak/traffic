@@ -6,14 +6,21 @@ import java.util.Random;
 public class Road {
 
     private ArrayList<Car> cars;
+        
+    
 
     private int[] l1; // lane 1 values: current speed of car (or -1 if no car)
     private int[] l2; // lane 2
 
     private int[] helperL1;
     private int[] helperL2;
-
-    public Road() {
+    
+    private boolean helperLegalMoveCheck;
+    
+    public boolean isStable;
+    
+    
+    public Road(int numIterations) {
         // Initialise variables
         cars = new ArrayList<>();
         l1 = new int[TrafficSimulation.ROAD_SIZE];
@@ -26,7 +33,9 @@ public class Road {
             l1[i] = -1;
             l2[i] = -1;
         }
-
+        
+                
+        
         // randomly generate all the cars
         int l1_dummyPosition = 0, l2_dummyPosition = 0, dummyPosition = 0, normal_generated = 0, fast_generated = 0, lane, type_of_car;
         Car tmpC;
@@ -47,10 +56,10 @@ public class Road {
 
             // generate the car and add it to the list of cars
             if (type_of_car == 1) {
-                tmpC = new SlowCar(lane, dummyPosition);
+                tmpC = new NormalCar(lane, dummyPosition, numIterations);
                 normal_generated++;
             } else {
-                tmpC = new FastCar(lane, dummyPosition);
+                tmpC = new FastCar(lane, dummyPosition, numIterations);
                 fast_generated++;
             }
             cars.add(tmpC);
@@ -68,13 +77,16 @@ public class Road {
 
         // generate a car that will break down (it will become an obstacle on the road)
         if (TrafficSimulation.BREAKING_DOWN_PROBABILITY != 0) {
-            tmpC = new BrokenCar(r.nextInt(9) + 1, r.nextInt(2) + 1, dummyPosition);
+            tmpC = new BrokenCar(r.nextInt(9) + 1, r.nextInt(2) + 1, dummyPosition, numIterations);
             cars.add(tmpC);
             l1[dummyPosition] = tmpC.getSpeed();
         }
+        
+        this.isStable = false;
     }
 
     public void nextState() {
+        this.helperLegalMoveCheck = true;
         // TODO: calculate the max speed of each lane right now and enforce a limit
 
         // CALCULATE NEW STATE /////////////////////////////////////////////////
@@ -87,6 +99,7 @@ public class Road {
         // move cars (check rules on current road and save new positions in next road)
         for (Car car : cars) {
             if (!car.move(l1, l2)) {
+                this.helperLegalMoveCheck = false;
                 System.out.println("Car decelerated because it had no legal moves! \n" + car);
             }
             if (car.getLane() == 1)
@@ -98,6 +111,10 @@ public class Road {
         // set new state
         l1 = helperL1.clone();
         l2 = helperL2.clone();
+        
+        if (this.helperLegalMoveCheck) {
+           this.isStable = true; 
+        }
     }
 
     /**

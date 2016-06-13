@@ -16,8 +16,8 @@ public class BrokenCar extends Car {
      * @param lane The current lane of the car.
      * @param position The current position of the car.
      */
-    public BrokenCar(int speed, int lane, int position) {
-        super(speed, lane, position); // calls the parent constructor
+    public BrokenCar(int speed, int lane, int position, int logLength) {
+        super(speed, lane, position, logLength); // calls the parent constructor
 
         maximumSpeed = TrafficSimulation.MAX_NORMAL_CAR_SPEED;
         maximumAcceleration = 1;
@@ -49,12 +49,15 @@ public class BrokenCar extends Car {
 
         // Set up things for next move:
         rand = r.nextFloat();
-        if (rand < breakDownProb) // car breaks down with a small probability
-            isBrokenDown = true;
-
-        if (getFixedProb > 0 && rand > 1 - getFixedProb) // car gets fixed with a small probability
+        if (isBrokenDown) {
+            if (getFixedProb > 0 && rand > 1 - getFixedProb) // car gets fixed with a small probability
             isBrokenDown = false;
-
+            TrafficSimulation.GLOBAL_SPEED_RULE = false;
+        } else {
+            if (rand < breakDownProb) // car breaks down with a small probability
+            isBrokenDown = true;
+            TrafficSimulation.GLOBAL_SPEED_RULE = true;
+        }      
         return moved;
     }
 

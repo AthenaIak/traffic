@@ -10,19 +10,25 @@ import javax.swing.JScrollPane;
 
 final public class AnimatedSimulation {
 
-    private final Road road = new Road();
+    private Road road;
     private static final int cooldown = TrafficSimulation.SIMULATION_STEP_COOLDOWN; //cooldown between steps of the simulation
     private final int carWidth = TrafficSimulation.CAR_WIDTH;
     private final int carHeight = 10;
     private int numRuns;
-
+    
+    private int numIterations;
+    
     private JFrame frame;
     private DrawPanel drawPanel;
 
     /**
      * This method initialises and performs the simulation.
      */
-    public void initialiseSimulation() {
+    public void initialiseSimulation(int numOfIterations) {
+        numIterations = numOfIterations;
+        
+        road = new Road(numIterations);
+        
         // set window title and stop running if X is pressed
         frame = new JFrame("Simulation");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,10 +62,10 @@ final public class AnimatedSimulation {
      * @param numberOfIterations The number of states the simulation will run
      * for. If 0, then it never stops running.
      */
-    public void runSimulation(int numberOfIterations) {
+    public String runSimulation() {
         numRuns = 0;
 
-        while (numberOfIterations == 0 || numRuns < numberOfIterations) {
+        while (numIterations == 0 || numRuns < numIterations) {
             numRuns++;
 
             road.nextState(); // calculates the next state
@@ -76,6 +82,8 @@ final public class AnimatedSimulation {
                 e.printStackTrace();
             }
         }
+        
+        return calculateMeasures();
     }
 
     /**
@@ -106,5 +114,53 @@ final public class AnimatedSimulation {
                     g.fillRoundRect(c.getPosition() * carWidth, 103, carWidth - 5, carHeight, 2, 2);
             }
         }
+    }
+    
+    private String calculateMeasures() {
+        //Flow is measures in number of cars passing a certain point.
+        //Equivalently: Sum over all cars: number of cells traveled / road size
+        int totalDistance = 0;
+        int totalSlowDistance = 0;
+        int totalFastDistance = 0;
+        
+        int maxSpeedSlow = -1;
+        int maxSpeedFast = -1;
+        
+        int bestFlowFast = 0;
+        int bestFlowSlow = 0;
+        int worstFlowFast = 1000000;
+        int worstFlowSlow = 1000000;
+        
+        int numSlow = 0;
+        int numFast = 0;
+        
+        for (Car c : road.getCars()) {
+            String type = c.getType();
+            
+            if (type == "N") {
+                numSlow++;
+                bestFlowSlow = c.getTraveledDistance() > bestFlowSlow ? c.getTraveledDistance() : bestFlowSlow;
+                worstFlowSlow = c.getTraveledDistance() < worstFlowSlow ? c.getTraveledDistance() : worstFlowSlow;
+                
+                totalSlowDistance += c.getTraveledDistance();
+                
+                maxSpeedSlow = c.getMaxSpeed() > maxSpeedSlow ? c.getMaxSpeed() : maxSpeedSlow;
+                
+            } else if (type == "F") {
+                numFast++;
+                bestFlowFast = c.getTraveledDistance() > bestFlowFast ? c.getTraveledDistance() : bestFlowFast;
+                worstFlowFast = c.getTraveledDistance() < worstFlowFast ? c.getTraveledDistance() : worstFlowFast;
+                
+                totalFastDistance += c.getTraveledDistance();
+                
+                maxSpeedFast = c.getMaxSpeed() > maxSpeedFast ? c.getMaxSpeed() : maxSpeedFast;
+            }
+            
+            totalDistance += c.getTraveledDistance();
+        }
+        //model, road_block, max_speed_slow, max_speed_fast, fast_car_ratio, density, total_all_cars_distance, total_slow_cars_distance, total_fast_cars_distance, worst_case_distance_slow_cars, worst_cast_distance_fast_cars, best_case_distance_slow_car, best_case_distance_fast_car,num_slow_cars,num_fast_cars
+        String return_ =  "ours,"+(TrafficSimulation.BREAKING_DOWN_PROBABILITY == 0 ? "0" : "1") + "," + maxSpeedSlow + "," + maxSpeedFast + ",";
+        return_ += TrafficSimulation.FAST_CAR_RATIO + "," + TrafficSimulation.DENSITY + "," + totalDistance + "," + totalSlowDistance + "," + totalFastDistance + "," +  worstFlowSlow + "," + worstFlowFast + "," + bestFlowSlow + "," + bestFlowFast + "," + numSlow + "," + numFast;
+        return return_;
     }
 }
