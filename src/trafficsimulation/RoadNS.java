@@ -203,7 +203,8 @@ public class RoadNS {
         for (CarNS c : cars) {
             totalDistance += c.getTraveledDistance();
         }
-        double flow = ((double) totalDistance) / (numIterations * ROAD_SIZE * 2 * (NUM_SLOW_CARS + NUM_FAST_CARS));
+//        double flow = ((double) totalDistance) / (numIterations * ROAD_SIZE * 2 * (NUM_SLOW_CARS + NUM_FAST_CARS));
+        double flow = ((double) totalDistance) / numIterations;
         System.out.println("Flow per lane: " + flow);
     }
 
@@ -318,9 +319,8 @@ public class RoadNS {
         int newLane = car.lane;
         
         // commit the changes
-//        car.setLane(newLane);
         car.setPosition(newPosition);
-        //Setting the new speed is already done during the call to adaptSpeed();
+        //Setting the new speed, lane is already done during the call to adaptSpeed();
 
         if (RoadNS.DEBUG) 
             System.out.println("Car " + car.getID() + " old speed " + speed + " new speed " + newSpeed + " old lane " + lane + " new lane " + newLane + "\n");

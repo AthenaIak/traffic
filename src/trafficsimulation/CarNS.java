@@ -59,8 +59,13 @@ public class CarNS {
         return lane;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
+    public void setPosition(int newPosition) {
+        if (this.position + speed >= RoadNS.ROAD_SIZE) {
+            traveledDistance += RoadNS.ROAD_SIZE - this.position;
+            traveledDistance += newPosition;
+        } else traveledDistance += newPosition - this.position;
+        
+        this.position = newPosition;
     }
 
     public int getPosition() {
