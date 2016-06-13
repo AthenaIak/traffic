@@ -30,7 +30,7 @@ public class RoadNS {
     public static int TYPE_CAR_SLOW = 1;
     public static int TYPE_CAR_FAST = 2;
     
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
     public static int DISTANCE_TO_LOOK_AHEAD = 16;
             
     private ArrayList<CarNS> cars;                // contains cars on the road
@@ -78,7 +78,12 @@ public class RoadNS {
     /*==============================================================================
     Generate cars for the model
     - position of car, lane of car, speed of car are randomly generated
-    - distance between a car and the car in front of it (same lane) is 2 x speed of the car
+    - distance between a car and the car in front of it (same lane) is 2 x speed of the car (2-seconds rule)
+    - due to road situation, speed of cars may be limitted:
+        road length (both lanes) = 2 x L
+        num car = N
+        mean gap between cars = 2L/N
+        therefore v should be <= L/N (to satisfy 2-seconds rule )
     *==============================================================================*/
     public void generateCars(){
         // randomly generate all the cars
@@ -86,17 +91,21 @@ public class RoadNS {
         int rightLane_dummyPosition = 0, leftLane_dummyPosition = 0, dummyPosition = 0, slow_generated = 0, fast_generated = 0, lane, type_of_car;
         CarNS tmpC;
         Random r = new Random();
-        int meanDistance = (int) (ROAD_SIZE * 2 / (NUM_FAST_CARS + NUM_SLOW_CARS));
+        int limitSpeed = (int) (ROAD_SIZE / (NUM_FAST_CARS + NUM_SLOW_CARS));
         
         for (int i = 0; i < NUM_FAST_CARS + NUM_SLOW_CARS; i++) {
             
-            // randomly choose lane
-            lane = r.nextInt(NUM_LANES) + 1;
+            // randomly choose the lane (unless the limit is reached)
+            if (rightLane_dummyPosition>= ROAD_SIZE)
+                lane = LEFT_LANE;
+            else if (leftLane_dummyPosition>= ROAD_SIZE)
+                lane = RIGHT_LANE;            
+            else lane = r.nextInt(NUM_LANES) + 1;            
             
             // retrieve position for the (soon to be generated) car to be placed
             if (lane == RIGHT_LANE) dummyPosition = rightLane_dummyPosition;
             else dummyPosition = leftLane_dummyPosition;
-
+            
             // randomly choose the type of car (unless the limit is reached)
             if (slow_generated == NUM_SLOW_CARS)            // limit is reached
                 type_of_car = TYPE_CAR_FAST;
@@ -106,10 +115,10 @@ public class RoadNS {
 
             // generate the car and add it to the list of cars
             if (type_of_car == TYPE_CAR_SLOW) {
-                tmpC = new SlowCarNS(i, lane, dummyPosition);
+                tmpC = new SlowCarNS(i, lane, dummyPosition, limitSpeed);
                 slow_generated++;
             } else {
-                tmpC = new FastCarNS(i, lane, dummyPosition);
+                tmpC = new FastCarNS(i, lane, dummyPosition, limitSpeed);
                 fast_generated++;
             }
             cars.add(tmpC);
@@ -118,11 +127,8 @@ public class RoadNS {
             if (lane == RIGHT_LANE) rightLane[dummyPosition] = tmpC.getSpeed();
             else leftLane[dummyPosition] = tmpC.getSpeed();
 
-            // follow the 2-seconds rule with randomness, so cars distance will be between [1.5 speed, 2.5 speed]
-//            dummyPosition = Math.floorMod(dummyPosition + tmpC.getSpeed() + tmpC.getSpeed() / 2 + r.nextInt(tmpC.getSpeed()), ROAD_SIZE);
-
-            //
-            dummyPosition = Math.floorMod(dummyPosition + r.nextInt(meanDistance) + 1, ROAD_SIZE);
+            // follow the 2-seconds rule 
+            dummyPosition = dummyPosition + 2*tmpC.getSpeed();
 
             // set the position for the next car
             if (lane == RIGHT_LANE) rightLane_dummyPosition = dummyPosition;
