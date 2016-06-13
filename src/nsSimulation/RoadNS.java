@@ -76,6 +76,8 @@ public class RoadNS {
         CarNS tmpC;
         Random r = new Random();
         int limitSpeed = (int) (TrafficSimulation.ROAD_SIZE / (TrafficSimulation.NUM_FAST_CARS + TrafficSimulation.NUM_SLOW_CARS));
+        boolean createdBrokenCar = ! TrafficSimulation.HAS_BROKEN_CAR;
+        
         
         for (int i = 0; i < TrafficSimulation.NUM_FAST_CARS + TrafficSimulation.NUM_SLOW_CARS; i++) {
             
@@ -90,6 +92,7 @@ public class RoadNS {
             if (lane == RIGHT_LANE) dummyPosition = rightLane_dummyPosition;
             else dummyPosition = leftLane_dummyPosition;
             
+            
             // randomly choose the type of car (unless the limit is reached)
             if (slow_generated == TrafficSimulation.NUM_SLOW_CARS)            // limit is reached
                 type_of_car = TYPE_CAR_FAST;
@@ -98,9 +101,15 @@ public class RoadNS {
             else type_of_car = r.nextInt(NUM_TYPE_CAR) + 1; // randomly
 
             // generate the car and add it to the list of cars
-            if (type_of_car == TYPE_CAR_SLOW) {
-                tmpC = new SlowCarNS(i, lane, dummyPosition, limitSpeed);
-                slow_generated++;
+            if (type_of_car == TYPE_CAR_SLOW) {                
+                if (!createdBrokenCar && r.nextDouble() < 0.1){
+                    createdBrokenCar = true;
+                    tmpC = new BrokenCarNS(i, lane, dummyPosition, limitSpeed); // broken car
+                    slow_generated++;
+                } else {
+                    tmpC = new SlowCarNS(i, lane, dummyPosition, limitSpeed);   // slow car
+                    slow_generated++;                    
+                }                
             } else {
                 tmpC = new FastCarNS(i, lane, dummyPosition, limitSpeed);
                 fast_generated++;

@@ -43,6 +43,7 @@ public class TrafficSimulation {
     public static double PROBABILITY_FLUCTUATION = .25;
     public static int DISTANCE_TO_LOOK_AHEAD = 7;
     public static int SLACK = 3;
+    public static boolean APPLY_SYMMETRIC_RULE = true; 
 
     // 
     public static int ROAD_SIZE = 0;                      // number of cells
@@ -85,7 +86,7 @@ public class TrafficSimulation {
         double[] fastCarRatios = {.9}; //{0,0.25,0.50,0.75,1.0};
         int[] maxSpeedsSlow = {3};
         int[] maxSpeedsFast = {5};
-        boolean[] brokenCar = {false,true};
+        boolean[] brokenCar = {true};
         int[] arrDistanceLookAhead = {7};
         int[] slacks = {3};
         

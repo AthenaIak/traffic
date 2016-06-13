@@ -4,13 +4,14 @@ import java.awt.Color;
 import java.util.Random;
 
 /*==============================================================================
-Implement Car class for NS model
+Implement Car class for NS model based on 
+Nagel, K., Wolf, D. E., Wagner, P., & Simon, P. (1998). Two-lane traffic rules for cellular automata: A systematic approach. Physical Review E, 58(2), 1425–1437. http://doi.org/10.1103/PhysRevE.58.1425
 ===============================================================================*/
 
 /*
- speed: 
- cells/t   m/s km/h
-    1      7.5	27
+ with cell length = 7.5m 
+ speed          km/h
+    1       	27
     2		54
     3		81
     4		108
@@ -106,10 +107,11 @@ public class CarNS {
         
         if (carFront.getDistance() <= TrafficSimulation.DISTANCE_TO_LOOK_AHEAD || carFrontNextLane.getDistance() <= TrafficSimulation.DISTANCE_TO_LOOK_AHEAD){            
             
-            if (lane==RoadNS.RIGHT_LANE) {
-                // symmetric rule
-                if (speed==0){
-                    if (goodGapToChange){
+            if (lane==RoadNS.RIGHT_LANE) {                
+                if (TrafficSimulation.APPLY_SYMMETRIC_RULE && speed==0){
+                    // symmetric rule - paper section VIII-B
+                    if (goodGapToChange && carFrontNextLane.getDistance()>carFront.getDistance()){
+//                    if (goodGapToChange){
                         lane = RoadNS.LEFT_LANE;     // switch lane
                         if (TrafficSimulation.DEBUG)
                             System.out.print("Change to left lane. ");                          
@@ -119,10 +121,11 @@ public class CarNS {
                     if (TrafficSimulation.DEBUG)
                         System.out.print("Change to left lane. ");  
                 }
-            } else {
-                // symmetric rule
-                if (speed==0){
-                    if (goodGapToChange){
+            } else {                
+                if (TrafficSimulation.APPLY_SYMMETRIC_RULE && speed==0){
+                    // symmetric rule - paper section VIII-B
+                    if (goodGapToChange && carFrontNextLane.getDistance()>carFront.getDistance()){
+//                    if (goodGapToChange){
                         lane = RoadNS.RIGHT_LANE;     // switch lane
                         if (TrafficSimulation.DEBUG)
                             System.out.print("Change to left lane. ");                          
@@ -135,7 +138,7 @@ public class CarNS {
             }            
         }
         
-        // adjust speed        
+        // forward movement - paper section VI-B
         if (speed < maxSpeed) speed += 1;
         if (speed > carFront.getDistance()) speed = carFront.getDistance();
         if (speed >= 1){
