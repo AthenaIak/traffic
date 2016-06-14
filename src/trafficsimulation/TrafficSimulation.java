@@ -39,12 +39,12 @@ public class TrafficSimulation {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-        DENSITY = 0.1;
-        MAX_SPEED_SLOW_CAR = 8;
-        MAX_SPEED_FAST_CAR = 11;
-        FAST_CAR_RATIO = 0.25;
-        NUM_SLOW_CARS = (int) (DENSITY * 2 * ROAD_SIZE * (1 - FAST_CAR_RATIO));
-        NUM_FAST_CARS = (int) (DENSITY * 2 * ROAD_SIZE * FAST_CAR_RATIO);
+//        DENSITY = 0.1;
+//        MAX_SPEED_SLOW_CAR = 8;
+//        MAX_SPEED_FAST_CAR = 11;
+//        FAST_CAR_RATIO = 0.25;
+//        NUM_SLOW_CARS = (int) (DENSITY * 2 * ROAD_SIZE * (1 - FAST_CAR_RATIO));
+//        NUM_FAST_CARS = (int) (DENSITY * 2 * ROAD_SIZE * FAST_CAR_RATIO);
         
         GLOBAL_SPEED_RULE = false;
         GLOBAL_MAX_SPEED = 3;
@@ -56,9 +56,11 @@ public class TrafficSimulation {
         String toFile = "";
         PrintWriter writer = new PrintWriter("simulations.txt","UTF-8");
 
- 
+        double roadLength = (double) ROAD_SIZE * 3 / 1000;  // in km
+        int totalCars;
         
-        double[] trafficDensities = {0.10,0.20,0.30,0.40};
+//        double[] trafficDensities = {0.10,0.20,0.30,0.40};
+        double[] trafficDensities = {40, 80, 120, 160, 200};
         double[] fastCarRatios = {0,0.25,0.50,0.75,1.0};
         int[] maxSpeedsSlow = {3,6,9};
         int[] maxSpeedsFast = {4,8,11};
@@ -74,6 +76,15 @@ public class TrafficSimulation {
                         for (boolean global : globalRules) {
                             for (boolean broken : brokenCar) {
                                 DENSITY = density;
+                                totalCars = (int) (roadLength  * density);
+                                NUM_FAST_CARS = (int) (ratio * totalCars);
+                                NUM_SLOW_CARS = totalCars - NUM_FAST_CARS;
+                                if (broken && NUM_SLOW_CARS==0){
+                                    NUM_SLOW_CARS ++;   // broken car is counted in number of slow cars
+                                    NUM_FAST_CARS --;
+                                }
+                                System.out.println("Num fast car: " + NUM_FAST_CARS + ", Num slow car: " + NUM_SLOW_CARS);
+                                
                                 MAX_SPEED_SLOW_CAR = slow;
                                 MAX_SPEED_FAST_CAR = fast;
                                 FAST_CAR_RATIO = ratio;
@@ -81,6 +92,8 @@ public class TrafficSimulation {
                                 BREAKING_DOWN_PROBABILITY = broken ? 0.3 : 0.0;
                                 simulation.initialiseSimulation(NUMBER_OF_ITERATIONS);
                                 writer.println(simulation.runSimulation());
+                                
+                                return; // debug
                             }
                         }
                     }
