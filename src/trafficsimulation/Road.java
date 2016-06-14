@@ -162,7 +162,8 @@ public class Road {
         traffic_l1 += "|";
         traffic_l2 += "|";
 
-        System.out.println(traffic_l1 + "\n" + traffic_l2 + "\n");
+        System.out.println(traffic_l2 + "\n" + traffic_l1 + "\n");
+//        System.out.println(traffic_l1 + "\n" + traffic_l2 + "\n");
     }
 
     /**
