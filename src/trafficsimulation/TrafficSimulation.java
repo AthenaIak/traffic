@@ -18,15 +18,17 @@ public class TrafficSimulation {
     public static final int GLOBAL_MAXIMUM_DECELERATION = 2;
     public static final int GLOBAL_MINIMUM_DECELERATION = 1;
     public static final int GLOBAL_MAXIMUM_ACCELERATION = 2;
+    
+    public static final int MAX_ACCELERATION_SLOW_CAR = 1;
     ////////////////////////////////////////////////////////////////////////////
 
     // CONFIGURATIONS //////////////////////////////////////////////////////////
-    public static int MAX_NORMAL_CAR_SPEED;
-    public static int MAX_FAST_CAR_SPEED;
+    public static int MAX_SPEED_SLOW_CAR;
+    public static int MAX_SPEED_FAST_CAR;
     public static double DENSITY;
     public static double FAST_CAR_RATIO; // fast/total cars
-    public static int NUMBER_OF_NORMAL_CARS;
-    public static int NUMBER_OF_FAST_CARS;
+    public static int NUM_SLOW_CARS;
+    public static int NUM_FAST_CARS;
     public static int NUMBER_OF_ITERATIONS;
     public static boolean GLOBAL_SPEED_RULE;
     public static int GLOBAL_MAX_SPEED;
@@ -38,11 +40,11 @@ public class TrafficSimulation {
      */
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
         DENSITY = 0.1;
-        MAX_NORMAL_CAR_SPEED = 8;
-        MAX_FAST_CAR_SPEED = 11;
+        MAX_SPEED_SLOW_CAR = 8;
+        MAX_SPEED_FAST_CAR = 11;
         FAST_CAR_RATIO = 0.25;
-        NUMBER_OF_NORMAL_CARS = (int) (DENSITY * 2 * ROAD_SIZE * (1 - FAST_CAR_RATIO));
-        NUMBER_OF_FAST_CARS = (int) (DENSITY * 2 * ROAD_SIZE * FAST_CAR_RATIO);
+        NUM_SLOW_CARS = (int) (DENSITY * 2 * ROAD_SIZE * (1 - FAST_CAR_RATIO));
+        NUM_FAST_CARS = (int) (DENSITY * 2 * ROAD_SIZE * FAST_CAR_RATIO);
         
         GLOBAL_SPEED_RULE = false;
         GLOBAL_MAX_SPEED = 3;
@@ -61,7 +63,7 @@ public class TrafficSimulation {
         int[] maxSpeedsSlow = {3,6,9};
         int[] maxSpeedsFast = {4,8,11};
         boolean[] globalRules = {false,true};
-        boolean[] brokenCar = {false,true};
+        boolean[] brokenCar = {true, false};
         
         AnimatedSimulation simulation = new AnimatedSimulation();
         
@@ -72,8 +74,8 @@ public class TrafficSimulation {
                         for (boolean global : globalRules) {
                             for (boolean broken : brokenCar) {
                                 DENSITY = density;
-                                MAX_NORMAL_CAR_SPEED = slow;
-                                MAX_FAST_CAR_SPEED = fast;
+                                MAX_SPEED_SLOW_CAR = slow;
+                                MAX_SPEED_FAST_CAR = fast;
                                 FAST_CAR_RATIO = ratio;
                                 GLOBAL_SPEED_RULE = global;
                                 BREAKING_DOWN_PROBABILITY = broken ? 0.3 : 0.0;

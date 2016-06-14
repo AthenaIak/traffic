@@ -12,20 +12,22 @@ public class BrokenCar extends Car {
 
     /**
      * Creates a car. Decides speed randomly.
-     * @param speed The current speed of the car.
-     * @param lane The current lane of the car.
-     * @param position The current position of the car.
+     * @param lane          The current lane of the car.
+     * @param position      The current position of the car.
+     * @param logLength     The number of iterations
+     * @param limitSpeed    constraint speed at this time
      */
-    public BrokenCar(int speed, int lane, int position, int logLength) {
-        super(speed, lane, position, logLength); // calls the parent constructor
-
-        maximumSpeed = TrafficSimulation.MAX_NORMAL_CAR_SPEED;
-        maximumAcceleration = 1;
-        maximumDeceleration = TrafficSimulation.GLOBAL_MINIMUM_DECELERATION;
-        isBrokenDown = false;
+    public BrokenCar(int lane, int position, int logLength, int limitSpeed) {
+        super(lane, position, logLength); // calls the parent constructor
 
         r = new Random();
         color = new Color(0, 255, 0);
+
+        maximumSpeed = TrafficSimulation.MAX_SPEED_SLOW_CAR;
+        maximumAcceleration = TrafficSimulation.MAX_ACCELERATION_SLOW_CAR;
+        maximumDeceleration = TrafficSimulation.GLOBAL_MINIMUM_DECELERATION;
+        speed = Math.min(maximumSpeed, limitSpeed) - r.nextInt(2);            // [maxSpeed-1, maxSpeed]
+        isBrokenDown = false;
     }
 
     /**

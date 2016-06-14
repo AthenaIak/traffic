@@ -44,18 +44,19 @@ public abstract class Car {
      * @param position The current position of the car.
      * @param logLength The number of iterations
      */
-    public Car(int speed, int lane, int position, int logLength) {
-        this.speed = speed;
-        this.lane = lane;
-        this.position = position;
-        this.traveledDistance = 0;
-        this.speedLog = new int[logLength];
-    }
+//    public Car(int speed, int lane, int position, int logLength) {
+//        this.speed = speed;
+//        this.lane = lane;
+//        this.position = position;
+//        this.traveledDistance = 0;
+//        this.speedLog = new int[logLength];
+//    }
 
     /**
      * Creates a car.
      * @param lane The current lane of the car.
      * @param position The current position of the car.
+     * @param logLength The number of iterations
      */
     public Car(int lane, int position, int logLength) {
         this.lane = lane;

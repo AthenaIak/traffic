@@ -1,19 +1,27 @@
 package trafficsimulation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Road {
 
-    private ArrayList<Car> cars;
-        
+    public static int NUM_LANES = 2;
+    public static int RIGHT_LANE = 1;
+    public static int LEFT_LANE = 2;
     
+    public static int NUM_TYPE_CAR = 2;
+    public static int TYPE_CAR_SLOW = 1;
+    public static int TYPE_CAR_FAST = 2;
 
-    private int[] l1; // lane 1 values: current speed of car (or -1 if no car)
-    private int[] l2; // lane 2
+    
+    private ArrayList<Car> cars; 
+    
+    private int[] rightLane; // lane 1 values: current speed of car (or -1 if no car)
+    private int[] leftLane; // lane 2
 
-    private int[] helperL1;
-    private int[] helperL2;
+    private int[] helperRightLane;
+    private int[] helperLeftLane;
     
     private boolean helperLegalMoveCheck;
     
@@ -23,94 +31,117 @@ public class Road {
     public Road(int numIterations) {
         // Initialise variables
         cars = new ArrayList<>();
-        l1 = new int[TrafficSimulation.ROAD_SIZE];
-        l2 = new int[TrafficSimulation.ROAD_SIZE];
+        rightLane = new int[TrafficSimulation.ROAD_SIZE];
+        leftLane = new int[TrafficSimulation.ROAD_SIZE];
 
-        helperL1 = new int[TrafficSimulation.ROAD_SIZE];
-        helperL2 = new int[TrafficSimulation.ROAD_SIZE];
+        helperRightLane = new int[TrafficSimulation.ROAD_SIZE];
+        helperLeftLane = new int[TrafficSimulation.ROAD_SIZE];
 
-        for (int i = 0; i < l1.length; i++) {
-            l1[i] = -1;
-            l2[i] = -1;
+        for (int i = 0; i < rightLane.length; i++) {
+            rightLane[i] = -1;
+            leftLane[i] = -1;
         }
         
-                
+        generateCars(numIterations);
         
+        this.isStable = false;
+    }
+
+    
+    public void generateCars(int numIterations){
         // randomly generate all the cars
-        int l1_dummyPosition = 0, l2_dummyPosition = 0, dummyPosition = 0, normal_generated = 0, fast_generated = 0, lane, type_of_car;
+		
+        int rightLane_dummyPosition = 0, leftLane_dummyPosition = 0, dummyPosition = 0, slow_generated = 0, fast_generated = 0, lane, type_of_car;
         Car tmpC;
         Random r = new Random();
-        for (int i = 0; i < TrafficSimulation.NUMBER_OF_NORMAL_CARS + TrafficSimulation.NUMBER_OF_FAST_CARS; i++) {
-            // randomly choose lane
-            lane = r.nextInt(2) + 1;
+        int limitSpeed = (int) (TrafficSimulation.ROAD_SIZE / (TrafficSimulation.NUM_FAST_CARS + TrafficSimulation.NUM_SLOW_CARS));
+        boolean createdBrokenCar = (TrafficSimulation.BREAKING_DOWN_PROBABILITY == 0);
+  
+        for (int i = 0; i < TrafficSimulation.NUM_SLOW_CARS + TrafficSimulation.NUM_FAST_CARS; i++) {
+
+            // randomly choose the lane (unless the limit is reached)
+            if (rightLane_dummyPosition>= TrafficSimulation.ROAD_SIZE)
+                lane = LEFT_LANE;
+            else if (leftLane_dummyPosition>= TrafficSimulation.ROAD_SIZE)
+                lane = RIGHT_LANE;            
+            else lane = r.nextInt(NUM_LANES) + 1;            
+						
             // retrieve position for the (soon to be generated) car to be placed
-            if (lane == 1) dummyPosition = l1_dummyPosition;
-            else dummyPosition = l2_dummyPosition;
+            if (lane == RIGHT_LANE) dummyPosition = rightLane_dummyPosition;
+            else dummyPosition = leftLane_dummyPosition;
 
             // randomly choose the type of car (unless the limit is reached)
-            if (normal_generated == TrafficSimulation.NUMBER_OF_NORMAL_CARS)
-                type_of_car = 2;
-            else if (fast_generated == TrafficSimulation.NUMBER_OF_FAST_CARS)
-                type_of_car = 1;
-            else type_of_car = r.nextInt(2) + 1;
+            if (slow_generated == TrafficSimulation.NUM_SLOW_CARS)            // limit is reached
+                type_of_car = TYPE_CAR_FAST;
+            else if (fast_generated == TrafficSimulation.NUM_FAST_CARS)       // limit is reached
+                type_of_car = TYPE_CAR_SLOW;
+            else type_of_car = r.nextInt(NUM_TYPE_CAR) + 1; // randomly
 
             // generate the car and add it to the list of cars
-            if (type_of_car == 1) {
-                tmpC = new SlowCar(lane, dummyPosition, numIterations);
-                normal_generated++;
+            if (type_of_car == TYPE_CAR_SLOW) {                
+                if (!createdBrokenCar && TrafficSimulation.NUM_SLOW_CARS <= 4*(slow_generated+1)){
+                    createdBrokenCar = true;
+                    tmpC = new BrokenCar(lane, dummyPosition, numIterations, limitSpeed); // broken car
+                    slow_generated++;
+                } else {
+                    tmpC = new SlowCar(lane, dummyPosition, numIterations, limitSpeed);   // slow car
+                    slow_generated++;                    
+                }                
             } else {
-                tmpC = new FastCar(lane, dummyPosition, numIterations);
+                tmpC = new FastCar(lane, dummyPosition, numIterations, limitSpeed);
                 fast_generated++;
             }
             cars.add(tmpC);
 
             // save data to the road structure (lanes)
-            if (lane == 1) l1[dummyPosition] = tmpC.getSpeed();
-            else l2[dummyPosition] = tmpC.getSpeed();
+            if (lane == RIGHT_LANE) rightLane[dummyPosition] = tmpC.getSpeed();
+            else leftLane[dummyPosition] = tmpC.getSpeed();
 
-            // follow the 2-seconds rule with randomness, so cars distance will be between [1.5 speed, 2.5 speed]
-            dummyPosition = Math.floorMod(dummyPosition + tmpC.getSpeed() + tmpC.getSpeed() / 2 + r.nextInt(tmpC.getSpeed()), TrafficSimulation.ROAD_SIZE);
+            // follow the 2-seconds rule 
+            dummyPosition = dummyPosition + 2*tmpC.getSpeed();
 
-            if (lane == 1) l1_dummyPosition = dummyPosition;
-            else l2_dummyPosition = dummyPosition;
+            if (lane == RIGHT_LANE) rightLane_dummyPosition = dummyPosition;
+            else leftLane_dummyPosition = dummyPosition;
         }
 
         // generate a car that will break down (it will become an obstacle on the road)
-        if (TrafficSimulation.BREAKING_DOWN_PROBABILITY != 0) {
-            tmpC = new BrokenCar(r.nextInt(9) + 1, r.nextInt(2) + 1, dummyPosition, numIterations);
-            cars.add(tmpC);
-            l1[dummyPosition] = tmpC.getSpeed();
-        }
-        
-        this.isStable = false;
-    }
+//        if (TrafficSimulation.BREAKING_DOWN_PROBABILITY != 0) {
+//            tmpC = new BrokenCar(r.nextInt(2) + 1, dummyPosition, numIterations);
+//            cars.add(tmpC);
+//            rightLane[dummyPosition] = tmpC.getSpeed();
+//        }
 
+        // debug
+        System.out.println("Right lane\n" + Arrays.toString(rightLane) + "\n");
+        System.out.println("Left lane\n" + Arrays.toString(leftLane) + "\n");        
+    }
+    
     public void nextState() {
         this.helperLegalMoveCheck = true;
         // TODO: calculate the max speed of each lane right now and enforce a limit
 
         // CALCULATE NEW STATE /////////////////////////////////////////////////
         // clear helper lanes
-        for (int i = 0; i < helperL1.length; i++) {
-            helperL1[i] = -1;
-            helperL2[i] = -1;
+        for (int i = 0; i < helperRightLane.length; i++) {
+            helperRightLane[i] = -1;
+            helperLeftLane[i] = -1;
         }
 
         // move cars (check rules on current road and save new positions in next road)
         for (Car car : cars) {
-            if (!car.move(l1, l2)) {
+            if (!car.move(rightLane, leftLane)) {
                 this.helperLegalMoveCheck = false;
                 System.out.println("Car decelerated because it had no legal moves! \n" + car);
             }
             if (car.getLane() == 1)
-                helperL1[car.getPosition()] = car.getSpeed();
-            else helperL2[car.getPosition()] = car.getSpeed();
+                helperRightLane[car.getPosition()] = car.getSpeed();
+            else helperLeftLane[car.getPosition()] = car.getSpeed();
         }
         // END OF CALCULATE NEW STATE //////////////////////////////////////////
 
         // set new state
-        l1 = helperL1.clone();
-        l2 = helperL2.clone();
+        rightLane = helperRightLane.clone();
+        leftLane = helperLeftLane.clone();
         
         if (this.helperLegalMoveCheck) {
            this.isStable = true; 
@@ -123,9 +154,9 @@ public class Road {
     public void printTrafficSituation() {
         String traffic_l1 = "|", traffic_l2 = "|";
 
-        for (int i = 0; i < l1.length; i++) {
-            traffic_l1 += toSymbol(l1[i]);
-            traffic_l2 += toSymbol(l2[i]);
+        for (int i = 0; i < rightLane.length; i++) {
+            traffic_l1 += toSymbol(rightLane[i]);
+            traffic_l2 += toSymbol(leftLane[i]);
         }
 
         traffic_l1 += "|";
@@ -150,7 +181,7 @@ public class Road {
         for (Car c : cars) {
             totalDistance += c.getTraveledDistance();
         }
-        double flow = ((double) totalDistance) / (numIterations * TrafficSimulation.ROAD_SIZE * 2 * (TrafficSimulation.NUMBER_OF_NORMAL_CARS + TrafficSimulation.NUMBER_OF_FAST_CARS));
+        double flow = ((double) totalDistance) / (numIterations * TrafficSimulation.ROAD_SIZE * 2 * (TrafficSimulation.NUM_SLOW_CARS + TrafficSimulation.NUM_FAST_CARS));
         System.out.println("Flow per lane: " + flow);
     }
 
