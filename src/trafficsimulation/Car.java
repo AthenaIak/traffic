@@ -161,6 +161,11 @@ public abstract class Car {
         moves = -Math.floorDiv(-futurePrevCarSpeed, maximumDeceleration); // http://stackoverflow.com/questions/27643616/ceil-conterpart-for-math-floordiv-in-java
         // calculate the number of cells required for the car behind to come to full stop (and add 1 extra cell)
         minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;  // ((moves - 1) * moves) / 2 is 1+2+...+k = k*(k+1)/2 where k = moves-1
+        
+        // Hue - test reserved gap
+//        minFutureGap = 0;
+//        if (futurePrevCarSpeed>nextPosition-position)
+//            minFutureGap = moves * (futurePrevCarSpeed-nextPosition-position);        
 
         // minFutureGap is the minimum allowed gap. worstCaseGap is actual gap between the two cars, if *this* car performs the eximined move.
         if (prevCarPos > position) //comes full circle
@@ -199,6 +204,11 @@ public abstract class Car {
         moves = -Math.floorDiv(-nextSpeed, maximumDeceleration);
         // calculate the number of cells required for the car infront to come to full stop
         minFutureGap = moves * nextSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;
+        
+        // Hue - test reserved gap
+//        minFutureGap = 0;
+//        if (nextCarSpeed-TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION  < nextSpeed)
+//            minFutureGap = moves * (nextSpeed - nextCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION);
 
         // minFutureGap is the minimum allowed gap. worstCaseGap is actual gap between the two cars, if *this* car performs the eximined move.
         if (nextCarPos < position) //comes full circle
