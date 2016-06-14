@@ -11,8 +11,8 @@ public class SlowCar extends Car {
      * @param lane The current lane of the car.
      * @param position The current position of the car.
      */
-    public SlowCar(int speed, int lane, int position) {
-        super(speed, lane, position); // calls the parent constructor
+    public SlowCar(int speed, int lane, int position, int logLength) {
+        super(speed, lane, position, logLength); // calls the parent constructor
 
         maximumSpeed = TrafficSimulation.MAX_NORMAL_CAR_SPEED;
         maximumAcceleration = 1;
@@ -27,8 +27,8 @@ public class SlowCar extends Car {
      * @param lane The current lane of the car.
      * @param position The current position of the car.
      */
-    public SlowCar(int lane, int position) {
-        super(lane, position);
+    public SlowCar(int lane, int position, int logLength) {
+        super(lane, position, logLength);
         Random r = new Random();
 
         // make max_speed of car not always the same

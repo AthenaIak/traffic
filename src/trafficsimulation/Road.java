@@ -56,7 +56,7 @@ public class Road {
 
             // generate the car and add it to the list of cars
             if (type_of_car == 1) {
-                tmpC = new NormalCar(lane, dummyPosition, numIterations);
+                tmpC = new SlowCar(lane, dummyPosition, numIterations);
                 normal_generated++;
             } else {
                 tmpC = new FastCar(lane, dummyPosition, numIterations);
