@@ -38,6 +38,7 @@ public class TrafficSimulation {
 
     
     // parameter of NS model
+    public static int MAX_ACCELERATION = 1;               // default is 1 in NS
     public static int MAX_SPEED_FAST_CAR = 5;
     public static int MAX_SPEED_SLOW_CAR = 3;    
     public static double PROBABILITY_FLUCTUATION = .25;
@@ -78,17 +79,28 @@ public class TrafficSimulation {
         
         AnimatedSimulation simulation = new AnimatedSimulation();
         
+        // parameters related to road segment
         double cellLength = 7.5;            // in meter
         int roadLength = 10;                // in km, should be a multiple of cellLength 
         ROAD_SIZE = (int)(roadLength*1000/cellLength);   // number of cells
+        
+        // to use in the same scale with our model, set cellLength = 3, 
+        // consider changing the MAX_ACCELERATION, masSpeedsFast, maxSpeedsSlow as well
+        
+        
+        // parameters for NS model        
+        APPLY_SYMMETRIC_RULE = true;                // paper section VIII-B
+        MAX_ACCELERATION = 1;                       // consider changing this value if cell length is modified
+                                // to use the basic model in paper section VI-C, set slack=0 and APPLY_SYMMETRIC_RULE = false
+        int[] arrDistanceLookAhead = {7};   // {7, 16}
+        int[] slacks = {3};                 // {3, 9}
         
         double[] trafficDensities = {40, 80, 120, 160, 200};
         double[] fastCarRatios = {.9}; //{0,0.25,0.50,0.75,1.0};
         int[] maxSpeedsSlow = {3};
         int[] maxSpeedsFast = {5};
         boolean[] brokenCar = {true};
-        int[] arrDistanceLookAhead = {7};
-        int[] slacks = {3};
+        int numRepetitions = 5;                     // repeat each model xxx times
         
         int totalCars;
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("simulations.txt", true)));  // append to file
@@ -101,31 +113,36 @@ public class TrafficSimulation {
                         for (boolean broken : brokenCar) {
                             for (int distance : arrDistanceLookAhead) {
                                 for (int slack : slacks) {
+                                    for (int rep=0; rep < numRepetitions; rep++) {
                             
-                                    MAX_SPEED_FAST_CAR = fast;
-                                    MAX_SPEED_SLOW_CAR = slow;
+                                        MAX_SPEED_FAST_CAR = fast;
+                                        MAX_SPEED_SLOW_CAR = slow;
 
-                                    DISTANCE_TO_LOOK_AHEAD = distance;
-                                    SLACK = slack;
+                                        DISTANCE_TO_LOOK_AHEAD = distance;
+                                        SLACK = slack;
 
-                                    totalCars = (int) (roadLength  * density);
-                                    NUM_FAST_CARS = (int) (ratio * totalCars);
-                                    NUM_SLOW_CARS = totalCars - NUM_FAST_CARS;
-                                    HAS_BROKEN_CAR = broken;
+                                        totalCars = (int) (roadLength  * density);
+                                        NUM_FAST_CARS = (int) (ratio * totalCars);
+                                        NUM_SLOW_CARS = totalCars - NUM_FAST_CARS;
+                                        HAS_BROKEN_CAR = broken;
+                                        if (HAS_BROKEN_CAR && NUM_SLOW_CARS==0){
+                                            NUM_SLOW_CARS ++;   // broken car is counted in number of slow cars
+                                            NUM_FAST_CARS --;
+                                        }
 
-                                    DENSITY = density;
-        //                            MAX_NORMAL_CAR_SPEED = slow;
-        //                            MAX_FAST_CAR_SPEED = fast;
-        //                            FAST_CAR_RATIO = ratio;
-                                    BREAKING_DOWN_PROBABILITY = broken ? 0.3 : 0.0;
+                                        DENSITY = density;
+                                        BREAKING_DOWN_PROBABILITY = broken ? 0.3 : 0.0;
 
-                                    startTime = System.nanoTime();
-                                    simulation.initialiseSimulation(NUMBER_OF_ITERATIONS);
-                                    writer.println(simulation.runSimulation());                                    
-                                    System.out.println("Running one simulation: " + (System.nanoTime()-startTime)/Math.pow(10, 9) + "seconds");
-                                    
-                                    writer.close();
-                                    return;
+                                        startTime = System.nanoTime();
+                                        simulation.initialiseSimulation(NUMBER_OF_ITERATIONS);
+                                        writer.println(simulation.runSimulation());             // save to file
+                                        
+                                        System.out.println("Running one simulation: " + (System.nanoTime()-startTime)/Math.pow(10, 9) + "seconds");
+
+//                                        // for debugging
+//                                        writer.close();
+//                                        return;
+                                    }
                                 }
                             }
                         }

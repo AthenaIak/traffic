@@ -139,7 +139,7 @@ public class CarNS {
         }
         
         // forward movement - paper section VI-B
-        if (speed < maxSpeed) speed += 1;
+        if (speed < maxSpeed) speed += TrafficSimulation.MAX_ACCELERATION;
         if (speed > carFront.getDistance()) speed = carFront.getDistance();
         if (speed >= 1){
             Random r = new Random();

@@ -102,7 +102,7 @@ public class RoadNS {
 
             // generate the car and add it to the list of cars
             if (type_of_car == TYPE_CAR_SLOW) {                
-                if (!createdBrokenCar && r.nextDouble() < 0.1){
+                if (!createdBrokenCar && TrafficSimulation.NUM_SLOW_CARS <= 4*(slow_generated+1)){
                     createdBrokenCar = true;
                     tmpC = new BrokenCarNS(i, lane, dummyPosition, limitSpeed); // broken car
                     slow_generated++;
