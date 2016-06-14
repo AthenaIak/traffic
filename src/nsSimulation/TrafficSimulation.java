@@ -81,7 +81,7 @@ public class TrafficSimulation {
         
         // parameters related to road segment
         double cellLength = 7.5;            // in meter
-        int roadLength = 10;                // in km, should be a multiple of cellLength 
+        double roadLength = 7.5;                // in km, should be a multiple of cellLength 
         ROAD_SIZE = (int)(roadLength*1000/cellLength);   // number of cells
         
         // to use in the same scale with our model, set cellLength = 3, 
