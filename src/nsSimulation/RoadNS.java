@@ -122,6 +122,7 @@ public class RoadNS {
 
             // follow the 2-seconds rule 
             dummyPosition = dummyPosition + 2*tmpC.getSpeed();
+            if (tmpC.getSpeed()==0) dummyPosition +=1;          // speed is 0, so gap should be 1
 
             // set the position for the next car
             if (lane == RIGHT_LANE) rightLane_dummyPosition = dummyPosition;

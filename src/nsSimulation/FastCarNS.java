@@ -19,7 +19,7 @@ public class FastCarNS extends CarNS {
         Random r = new Random();
         color = new Color(255, r.nextInt(130), 0);
         maxSpeed = TrafficSimulation.MAX_SPEED_FAST_CAR;
-        speed = Math.min(maxSpeed, limitSpeed) - r.nextInt(2);            // [maxSpeed-1, maxSpeed]        
+        speed = Math.max(Math.min(maxSpeed, limitSpeed) - r.nextInt(2), 0);            // speed is from 0 to [maxSpeed-1, maxSpeed]        
     }
     
 }
