@@ -83,9 +83,9 @@ public class TrafficSimulation {
 //        simulation.initialiseSimulation(NUMBER_OF_ITERATIONS);
 //        writer.println(simulation.runSimulation());
        
-
+        long startTime;
         
-        writer.println("model,ith run, road_block, max_speed_slow, max_speed_fast, fast_car_ratio, density, total_all_cars_distance, total_slow_cars_distance, total_fast_cars_distance, worst_case_distance_slow_cars, worst_cast_distance_fast_cars, best_case_distance_slow_car, best_case_distance_fast_car,num_slow_cars,num_fast_cars");
+        writer.println("model,ith run, road_block, max_speed_slow, max_speed_fast, fast_car_ratio, density, total_all_cars_distance, total_slow_cars_distance, total_fast_cars_distance, worst_case_distance_slow_cars, worst_cast_distance_fast_cars, best_case_distance_slow_car, best_case_distance_fast_car,num_slow_cars,num_fast_cars,global_speed_rule");
         for (double density : trafficDensities) {
             for (double ratio : fastCarRatios) {
                 for (int slow : maxSpeedsSlow) {
@@ -106,8 +106,10 @@ public class TrafficSimulation {
                                     MAX_SPEED_FAST_CAR = fast;
                                     BREAKING_DOWN_PROBABILITY = broken ? 0.3 : 0.0;
                                     for (int i = 0; i < 5; i++) {
+//                                        startTime = System.nanoTime();
                                         simulation.initialiseSimulation(NUMBER_OF_ITERATIONS);
                                         writer.println(simulation.runSimulation(i));    
+//                                        System.out.println("Running one simulation: " + (System.nanoTime()-startTime)/Math.pow(10, 9) + "seconds");
                                     }
                                     System.out.println("5 things" + broken);
                                 }
