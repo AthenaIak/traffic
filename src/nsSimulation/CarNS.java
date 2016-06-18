@@ -28,6 +28,7 @@ public class CarNS {
     protected int maxSpeed;
     protected Color color;
     protected int traveledDistance;
+    protected int maxReachedSpeed = -1;
 
     public CarNS(int ID, int lane, int position) {
         this.ID = ID;
@@ -50,6 +51,16 @@ public class CarNS {
 
     public int getSpeed() {
         return speed;
+    }
+
+    public int getMaxReachedSpeed() {
+        return maxReachedSpeed;
+    }
+
+    public void setMaxReachedSpeed(int newSpeed) {
+        if (maxReachedSpeed < newSpeed) {
+            maxReachedSpeed = newSpeed;
+        }
     }
 
     public void setLane(int lane) {
@@ -77,7 +88,7 @@ public class CarNS {
         return color;
     }
 
-    private String getType() {
+    public String getType() {
         switch (this.getClass().toString()) {
             case "class nsSimulation.SlowCarNS":
                 return "S";
@@ -146,6 +157,7 @@ public class CarNS {
             if (r.nextDouble() < TrafficSimulation.PROBABILITY_FLUCTUATION) speed--;
         }
         
+        setMaxReachedSpeed(speed);
         return speed;
     }
     

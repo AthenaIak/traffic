@@ -62,7 +62,7 @@ public class BrokenCarNS extends CarNS {
     @Override
     public int adaptSpeed(SpeedDistance carFront, SpeedDistance carFrontNextLane, SpeedDistance carBehindNextLane){
             
-        boolean goodGapToChange = (carBehindNextLane.getDistance() >= TrafficSimulation.MAX_SPEED_FAST_CAR && carFrontNextLane.getDistance() >= speed);
+//        boolean goodGapToChange = (carBehindNextLane.getDistance() >= TrafficSimulation.MAX_SPEED_FAST_CAR && carFrontNextLane.getDistance() >= speed);
 
         if (isBrokenDown) { // if it broke decelerate by 1 until it stops
             speed = speed == 0 ? 0 : speed - 1;
@@ -77,6 +77,7 @@ public class BrokenCarNS extends CarNS {
             isBrokenDown = true;
         }      
         
+        setMaxReachedSpeed(speed);
         return speed;
     }    
 }

@@ -55,7 +55,7 @@ public class RoadNS {
         }
         
         generateCars();
-        printTrafficSituation();
+        if (TrafficSimulation.DEBUG) printTrafficSituation();
     }
 
     
@@ -129,18 +129,11 @@ public class RoadNS {
             else leftLane_dummyPosition = dummyPosition;
         }
         
-        // generate a car that will break down (it will become an obstacle on the road)
-        if (TrafficSimulation.HAS_BROKEN_CAR) {
-//            tmpC = new BrokenCar(r.nextInt(9) + 1, r.nextInt(2) + 1, dummyPosition);
-//            cars.add(tmpC);
-//            
-//            // TODO: randomly select blocked lane
-//            rightLane[dummyPosition] = tmpC.getSpeed();
-        }        
-
         // debug
-        System.out.println("Lane 1\n" + Arrays.toString(rightLane) + "\n");
-        System.out.println("Lane 2\n" + Arrays.toString(leftLane) + "\n");        
+        if (TrafficSimulation.DEBUG){
+            System.out.println("Lane 1\n" + Arrays.toString(rightLane) + "\n");
+            System.out.println("Lane 2\n" + Arrays.toString(leftLane) + "\n");        
+        }
     }
 
     public void nextState() {
@@ -296,7 +289,7 @@ public class RoadNS {
             }
         }
         
-        return null;    // stm wrong
+        return new SpeedDistance(TrafficSimulation.MAX_SPEED_FAST_CAR, Integer.MAX_VALUE);  // no car
     }
 
     private SpeedDistance getStatusWithBehindCar(int lane, int position) {
@@ -323,7 +316,7 @@ public class RoadNS {
             }
         }
         
-        return null;    // stm wrong
+        return new SpeedDistance(TrafficSimulation.MAX_SPEED_FAST_CAR, Integer.MAX_VALUE);  // no car
     }
     
     private void moveCar(CarNS car) {
