@@ -12,12 +12,13 @@ public class BrokenCar extends Car {
 
     /**
      * Creates a car. Decides speed randomly.
-     * @param lane          The current lane of the car.
-     * @param position      The current position of the car.
-     * @param logLength     The number of iterations
-     * @param limitSpeed    constraint speed at this time
+     *
+     * @param lane The current lane of the car.
+     * @param position The current position of the car.
+     * @param logLength The number of iterations
+     * @param limitSpeed constraint speed at this time
      */
-    public BrokenCar(int lane, int position, int logLength, int limitSpeed) {
+    public BrokenCar(int limitSpeed, int lane, int position, int logLength) {
         super(lane, position, logLength); // calls the parent constructor
 
         r = new Random();
@@ -34,6 +35,7 @@ public class BrokenCar extends Car {
      * Moves if it is not currently broken. If broken, it decelerates until it
      * stops. It remains stopped until it is repaired (then it moves normally
      * again).
+     *
      * @param l1 Right lane.
      * @param l2 Left lane.
      * @return True if it moved (or remained stopped) without a conflict.
@@ -47,19 +49,20 @@ public class BrokenCar extends Car {
             speed = speed == 0 ? 0 : speed - 1;
             position = Math.floorMod(position + speed, TrafficSimulation.ROAD_SIZE);
             moved = true;
-        } else moved = super.move(l1, l2); // if not broken, proceed as normal
-
+        } else {
+            moved = super.move(l1, l2); // if not broken, proceed as normal
+        }
         // Set up things for next move:
         rand = r.nextFloat();
         if (isBrokenDown) {
-            if (getFixedProb > 0 && rand > 1 - getFixedProb) // car gets fixed with a small probability
-            isBrokenDown = false;
-            TrafficSimulation.GLOBAL_SPEED_RULE = false;
-        } else {
-            if (rand < breakDownProb) // car breaks down with a small probability
+            if (getFixedProb > 0 && rand > 1 - getFixedProb) { // car gets fixed with a small probability
+                isBrokenDown = false;
+                TrafficSimulation.GLOBAL_SPEED_RULE = false;
+            }
+        } else if (rand < breakDownProb) { // car breaks down with a small probability
             isBrokenDown = true;
             TrafficSimulation.GLOBAL_SPEED_RULE = true;
-        }      
+        }
         return moved;
     }
 

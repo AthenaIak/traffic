@@ -23,67 +23,64 @@ final public class AnimatedSimulation {
 
     /**
      * This method initialises and performs the simulation.
+     * @param numberOfIterations The number of states the simulation will run
+     * for. If 0, then it never stops running.
      */
     public void initialiseSimulation(int numOfIterations) {
         numIterations = numOfIterations;
         
         road = new Road(numIterations);
         
-        // set window title and stop running if X is pressed
-        frame = new JFrame("Simulation");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // initialise the simulation
-        for (int i = 0; i < 10; i++) // skip the first states
-            road.nextState();
-        for (Car c : road.getCars())
-            c.clearTraveledDistance();
-        road.printTrafficSituation();
-
-        // create a panel that will contain the painting
-        drawPanel = new DrawPanel();
-        drawPanel.setPreferredSize(new Dimension(TrafficSimulation.ROAD_SIZE * carWidth, 300));
-
-        // create a panel that makes the scrollbars appear
-        JScrollPane jsp = new JScrollPane(drawPanel);
-        // put the painting panel inside the scrollable panel
-        jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-        // put everything on the frame
-        frame.getContentPane().add(BorderLayout.CENTER, jsp);
-        frame.setResizable(true);
-        frame.setSize(2000, 400);
-        frame.setLocationByPlatform(true);
-        frame.setVisible(true);
+//        // set window title and stop running if X is pressed
+//        frame = new JFrame("Simulation");
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//
+//        // initialise the simulation
+//        
+//        road.printTrafficSituation();
+//
+//        // create a panel that will contain the painting
+//        drawPanel = new DrawPanel();
+//        drawPanel.setPreferredSize(new Dimension(TrafficSimulation.ROAD_SIZE * carWidth, 300));
+//
+//        // create a panel that makes the scrollbars appear
+//        JScrollPane jsp = new JScrollPane(drawPanel);
+//        // put the painting panel inside the scrollable panel
+//        jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+//
+//        // put everything on the frame
+//        frame.getContentPane().add(BorderLayout.CENTER, jsp);
+//        frame.setResizable(true);
+//        frame.setSize(2000, 400);
+//        frame.setLocationByPlatform(true);
+//        frame.setVisible(true);
     }
 
     /**
      * Continuously calculates and presents the next state.
-     * @param numberOfIterations The number of states the simulation will run
-     * for. If 0, then it never stops running.
      */
-    public String runSimulation() {
+    public String runSimulation(int i) {
         numRuns = 0;
 
         while (numIterations == 0 || numRuns < numIterations) {
             numRuns++;
 
             road.nextState(); // calculates the next state
-            frame.repaint(); // calls paintComponent(g) to draw the new state
-            road.printTrafficSituation();
+//            frame.repaint(); // calls paintComponent(g) to draw the new state
+//            road.printTrafficSituation();
 
             // print the current flow every 100 iterations
-            if (numRuns % 100 == 0)
-                road.printFlow(numRuns);
+//            if (numRuns % 100 == 0)
+//                road.printFlow(numRuns);
 
-            try {
-                Thread.sleep(cooldown);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(cooldown);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
         
-        return calculateMeasures();
+        return calculateMeasures(i);
     }
 
     /**
@@ -92,6 +89,7 @@ final public class AnimatedSimulation {
      */
     private class DrawPanel extends JPanel {
 
+        @Override
         public void paintComponent(Graphics g) {
             setBackground(new Color(240, 240, 185));
             g.setColor(Color.BLACK);
@@ -116,7 +114,7 @@ final public class AnimatedSimulation {
         }
     }
     
-    private String calculateMeasures() {
+    private String calculateMeasures(int i) {
         //Flow is measures in number of cars passing a certain point.
         //Equivalently: Sum over all cars: number of cells traveled / road size
         int totalDistance = 0;
@@ -126,10 +124,10 @@ final public class AnimatedSimulation {
         int maxSpeedSlow = -1;
         int maxSpeedFast = -1;
         
-        int bestFlowFast = 0;
-        int bestFlowSlow = 0;
-        int worstFlowFast = 1000000;
-        int worstFlowSlow = 1000000;
+        int bestFlowFast = -1;
+        int bestFlowSlow = -1;
+        int worstFlowFast = 999999999;
+        int worstFlowSlow = 999999999;
         
         int numSlow = 0;
         int numFast = 0;
@@ -137,7 +135,7 @@ final public class AnimatedSimulation {
         for (Car c : road.getCars()) {
             String type = c.getType();
             
-            if (type == "N") {
+            if (type.equals("N")) {
                 numSlow++;
                 bestFlowSlow = c.getTraveledDistance() > bestFlowSlow ? c.getTraveledDistance() : bestFlowSlow;
                 worstFlowSlow = c.getTraveledDistance() < worstFlowSlow ? c.getTraveledDistance() : worstFlowSlow;
@@ -146,7 +144,7 @@ final public class AnimatedSimulation {
                 
                 maxSpeedSlow = c.getMaxSpeed() > maxSpeedSlow ? c.getMaxSpeed() : maxSpeedSlow;
                 
-            } else if (type == "F") {
+            } else if (type.equals("F")) {
                 numFast++;
                 bestFlowFast = c.getTraveledDistance() > bestFlowFast ? c.getTraveledDistance() : bestFlowFast;
                 worstFlowFast = c.getTraveledDistance() < worstFlowFast ? c.getTraveledDistance() : worstFlowFast;
@@ -159,7 +157,7 @@ final public class AnimatedSimulation {
             totalDistance += c.getTraveledDistance();
         }
         //model, road_block, max_speed_slow, max_speed_fast, fast_car_ratio, density, total_all_cars_distance, total_slow_cars_distance, total_fast_cars_distance, worst_case_distance_slow_cars, worst_cast_distance_fast_cars, best_case_distance_slow_car, best_case_distance_fast_car,num_slow_cars,num_fast_cars
-        String return_ =  "ours,"+(TrafficSimulation.BREAKING_DOWN_PROBABILITY == 0 ? "0" : "1") + "," + maxSpeedSlow + "," + maxSpeedFast + ",";
+        String return_ =  "ours,"+i+","+(TrafficSimulation.BREAKING_DOWN_PROBABILITY == 0 ? "0" : "1") + "," + maxSpeedSlow + "," + maxSpeedFast + ",";
         return_ += TrafficSimulation.FAST_CAR_RATIO + "," + TrafficSimulation.DENSITY + "," + totalDistance + "," + totalSlowDistance + "," + totalFastDistance + "," +  worstFlowSlow + "," + worstFlowFast + "," + bestFlowSlow + "," + bestFlowFast + "," + numSlow + "," + numFast;
         return return_;
     }
