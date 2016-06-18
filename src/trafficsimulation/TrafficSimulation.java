@@ -56,7 +56,11 @@ public class TrafficSimulation {
         String toFile = "";
         PrintWriter writer = new PrintWriter("simulations.txt","UTF-8");
 
-        double roadLength = (double) ROAD_SIZE * 3 / 1000;  // in km
+        double cellLength = 3;            // in meter
+        double roadLength = 7.5;                // in km, should be a multiple of cellLength 
+        ROAD_SIZE = (int)(roadLength*1000/cellLength);   // number of cells
+
+//        double roadLength = (double) ROAD_SIZE * 3 / 1000;  // in km
         int totalCars;
         
 //        double[] trafficDensities = {0.10,0.20,0.30,0.40};
