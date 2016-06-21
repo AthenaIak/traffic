@@ -31,29 +31,29 @@ final public class AnimatedSimulation {
         
         road = new Road(numIterations);
         
-//        // set window title and stop running if X is pressed
-//        frame = new JFrame("Simulation");
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//
-//        // initialise the simulation
-//        
-//        road.printTrafficSituation();
-//
-//        // create a panel that will contain the painting
-//        drawPanel = new DrawPanel();
-//        drawPanel.setPreferredSize(new Dimension(TrafficSimulation.ROAD_SIZE * carWidth, 300));
-//
-//        // create a panel that makes the scrollbars appear
-//        JScrollPane jsp = new JScrollPane(drawPanel);
-//        // put the painting panel inside the scrollable panel
-//        jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-//
-//        // put everything on the frame
-//        frame.getContentPane().add(BorderLayout.CENTER, jsp);
-//        frame.setResizable(true);
-//        frame.setSize(2000, 400);
-//        frame.setLocationByPlatform(true);
-//        frame.setVisible(true);
+        // set window title and stop running if X is pressed
+        frame = new JFrame("Simulation");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // initialise the simulation
+        
+        road.printTrafficSituation();
+
+        // create a panel that will contain the painting
+        drawPanel = new DrawPanel();
+        drawPanel.setPreferredSize(new Dimension(TrafficSimulation.ROAD_SIZE * carWidth, 300));
+
+        // create a panel that makes the scrollbars appear
+        JScrollPane jsp = new JScrollPane(drawPanel);
+        // put the painting panel inside the scrollable panel
+        jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        // put everything on the frame
+        frame.getContentPane().add(BorderLayout.CENTER, jsp);
+        frame.setResizable(true);
+        frame.setSize(2000, 400);
+        frame.setLocationByPlatform(true);
+        frame.setVisible(true);
     }
 
     /**
@@ -66,21 +66,22 @@ final public class AnimatedSimulation {
             numRuns++;
 
             road.nextState(); // calculates the next state
-//            frame.repaint(); // calls paintComponent(g) to draw the new state
-//            road.printTrafficSituation();
+            frame.repaint(); // calls paintComponent(g) to draw the new state
+            road.printTrafficSituation();
 
             // print the current flow every 100 iterations
 //            if (numRuns % 100 == 0)
 //                road.printFlow(numRuns);
 
-//            try {
-//                Thread.sleep(cooldown);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
+            try {
+                Thread.sleep(cooldown);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         
-        return calculateMeasures(i);
+        //return calculateMeasures(i);
+        return "";
     }
 
     /**

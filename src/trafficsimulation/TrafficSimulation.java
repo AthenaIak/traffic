@@ -8,12 +8,13 @@ public class TrafficSimulation {
 
     // GLOBAL CONSTANTS ////////////////////////////////////////////////////////
     // SIMULATION DETAILS
-    public static final int ROAD_SIZE = 1000; // number of cells in each lane
+    public static final int ROAD_SIZE = 150; // number of cells in each lane
     public static final int SIMULATION_STEP_COOLDOWN = 100;
     public static final int CAR_WIDTH = 10;
     // BROKEN CAR CONSTANTS 
-    public static double BREAKING_DOWN_PROBABILITY = 0.3;
-    public static final double GETTING_REPAIRED_PROBABILITY = 0;
+    public static double BREAKING_DOWN_PROBABILITY = 0.1;
+    //public static final double GETTING_REPAIRED_PROBABILITY = 0.05;
+    public static double GETTING_REPAIRED_PROBABILITY = 0;
     // MISCELLANEOUS
     public static final int GLOBAL_MAXIMUM_DECELERATION = 2;
     public static final int GLOBAL_MINIMUM_DECELERATION = 1;
@@ -66,60 +67,75 @@ public class TrafficSimulation {
         boolean[] brokenCar = {true, false};
         
         AnimatedSimulation simulation = new AnimatedSimulation();
-
-//        DENSITY = 0.2;
-//        totalCars = (int) (ROAD_SIZE  * DENSITY);
-//        FAST_CAR_RATIO = 0.5;
-//        NUM_FAST_CARS = (int) (FAST_CAR_RATIO * totalCars);
-//        NUM_SLOW_CARS = totalCars - NUM_FAST_CARS;
-//        System.out.println("Num fast car: " + NUM_FAST_CARS + ", Num slow car: " + NUM_SLOW_CARS);
-//        MAX_SPEED_SLOW_CAR = 6;
-//        MAX_SPEED_FAST_CAR = 9;
-//        GLOBAL_SPEED_RULE = true;
-//        if (GLOBAL_SPEED_RULE) {
-//            GLOBAL_MAX_SPEED = (int) (0.75 * MAX_SPEED_SLOW_CAR);
-//        }
-//        BREAKING_DOWN_PROBABILITY = true ? 0.3 : 0.0;
-//        simulation.initialiseSimulation(NUMBER_OF_ITERATIONS);
-//        writer.println(simulation.runSimulation());
-       
-        long startTime;
+      
+        //Case 1:
+        DENSITY = 0.15;
+        FAST_CAR_RATIO = 0.25;
+               
+        //Case 2:
+//        DENSITY = 0.15;
+//        FAST_CAR_RATIO = 0.75;
         
-        writer.println("model,ith run, road_block, max_speed_slow, max_speed_fast, fast_car_ratio, density, total_all_cars_distance, total_slow_cars_distance, total_fast_cars_distance, worst_case_distance_slow_cars, worst_cast_distance_fast_cars, best_case_distance_slow_car, best_case_distance_fast_car,num_slow_cars,num_fast_cars,global_speed_rule");
-        for (double density : trafficDensities) {
-            for (double ratio : fastCarRatios) {
-                for (int slow : maxSpeedsSlow) {
-                    for (int fast : maxSpeedsFast) {
-                        for (boolean global : globalRules) {
-                            for (boolean broken : brokenCar) {
-                                DENSITY = density;
-                                totalCars = (int) (ROAD_SIZE  * density);
-                                NUM_FAST_CARS = (int) (ratio * totalCars);
-                                NUM_SLOW_CARS = totalCars - NUM_FAST_CARS;
-                                if (slow <= fast) {
-                                    FAST_CAR_RATIO = ratio;
-                                    GLOBAL_SPEED_RULE = global;
-                                    if (global) {
-                                        GLOBAL_MAX_SPEED = (int) (0.75 * slow);
-                                    }
-                                    MAX_SPEED_SLOW_CAR = slow;
-                                    MAX_SPEED_FAST_CAR = fast;
-                                    BREAKING_DOWN_PROBABILITY = broken ? 0.3 : 0.0;
-                                    for (int i = 0; i < 5; i++) {
-//                                        startTime = System.nanoTime();
-                                        simulation.initialiseSimulation(NUMBER_OF_ITERATIONS);
-                                        writer.println(simulation.runSimulation(i));    
-//                                        System.out.println("Running one simulation: " + (System.nanoTime()-startTime)/Math.pow(10, 9) + "seconds");
-                                    }
-                                    System.out.println("5 things" + broken);
-                                }
-                                writer.flush();
-                            }
-                        }
-                    }
-                }
-            }
+        //Case 3:
+//        DENSITY = 0.5;
+//        GETTING_REPAIRED_PROBABILITY = 0.1;
+//        BREAKING_DOWN_PROBABILITY = 0.3;
+//        FAST_CAR_RATIO = 0.25;
+
+        
+        totalCars = (int) (ROAD_SIZE  * DENSITY);
+        
+        NUM_FAST_CARS = (int) (FAST_CAR_RATIO * totalCars);
+        NUM_SLOW_CARS = totalCars - NUM_FAST_CARS;
+        System.out.println("Num fast car: " + NUM_FAST_CARS + ", Num slow car: " + NUM_SLOW_CARS);
+        MAX_SPEED_SLOW_CAR = 9;
+        MAX_SPEED_FAST_CAR = 11;
+        GLOBAL_SPEED_RULE = false;
+
+        if (GLOBAL_SPEED_RULE) {
+            GLOBAL_MAX_SPEED = (int) (0.75 * MAX_SPEED_SLOW_CAR);
         }
-        writer.close();
+        BREAKING_DOWN_PROBABILITY = true ? 0.3 : 0.0;
+        simulation.initialiseSimulation(NUMBER_OF_ITERATIONS);
+        simulation.runSimulation(0);
+       
+//        long startTime;
+//        
+//        writer.println("model,ith run, road_block, max_speed_slow, max_speed_fast, fast_car_ratio, density, total_all_cars_distance, total_slow_cars_distance, total_fast_cars_distance, worst_case_distance_slow_cars, worst_cast_distance_fast_cars, best_case_distance_slow_car, best_case_distance_fast_car,num_slow_cars,num_fast_cars,global_speed_rule");
+//        for (double density : trafficDensities) {
+//            for (double ratio : fastCarRatios) {
+//                for (int slow : maxSpeedsSlow) {
+//                    for (int fast : maxSpeedsFast) {
+//                        for (boolean global : globalRules) {
+//                            for (boolean broken : brokenCar) {
+//                                DENSITY = density;
+//                                totalCars = (int) (ROAD_SIZE  * density);
+//                                NUM_FAST_CARS = (int) (ratio * totalCars);
+//                                NUM_SLOW_CARS = totalCars - NUM_FAST_CARS;
+//                                if (slow <= fast) {
+//                                    FAST_CAR_RATIO = ratio;
+//                                    GLOBAL_SPEED_RULE = global;
+//                                    if (global) {
+//                                        GLOBAL_MAX_SPEED = (int) (0.75 * slow);
+//                                    }
+//                                    MAX_SPEED_SLOW_CAR = slow;
+//                                    MAX_SPEED_FAST_CAR = fast;
+//                                    BREAKING_DOWN_PROBABILITY = broken ? 0.3 : 0.0;
+//                                    for (int i = 0; i < 5; i++) {
+////                                        startTime = System.nanoTime();
+//                                        simulation.initialiseSimulation(NUMBER_OF_ITERATIONS);
+//                                        writer.println(simulation.runSimulation(i));    
+////                                        System.out.println("Running one simulation: " + (System.nanoTime()-startTime)/Math.pow(10, 9) + "seconds");
+//                                    }
+//                                    System.out.println("5 things" + broken);
+//                                }
+//                                writer.flush();
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        writer.close();
     }
 }
