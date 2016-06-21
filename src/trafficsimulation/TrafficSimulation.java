@@ -73,7 +73,7 @@ public class TrafficSimulation {
         FAST_CAR_RATIO = 0.25;
                
         //Case 2:
-//        DENSITY = 0.15;
+//        DENSITY = 0.50;
 //        FAST_CAR_RATIO = 0.75;
         
         //Case 3:
