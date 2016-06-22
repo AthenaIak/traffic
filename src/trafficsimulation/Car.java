@@ -2,7 +2,6 @@ package trafficsimulation;
 
 import java.awt.Color;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 /*
  speed: 
@@ -39,18 +38,21 @@ public abstract class Car {
 
     /**
      * Creates a car.
-     *
      * @param speed The current speed of the car.
      * @param lane The current lane of the car.
      * @param position The current position of the car.
-     * @param logLength The number of iterations
+     * @param logLength The size of the array that will log the speed of each
+     * step of the car.
      */
     public Car(int speed, int lane, int position, int logLength) {
         this.speed = speed;
         this.lane = lane;
         this.position = position;
-        this.traveledDistance = 0;
-        this.speedLog = new int[logLength];
+        traveledDistance = 0;
+        if (logLength > 0)
+            speedLog = new int[logLength];
+        else // if the simulation runs forever, don't reserve an array (no statistics)
+            speedLog = null;
     }
 
     /**
@@ -58,13 +60,17 @@ public abstract class Car {
      *
      * @param lane The current lane of the car.
      * @param position The current position of the car.
-     * @param logLength The number of iterations
+     * @param logLength The size of the array that will log the speed of each
+     * step of the car.
      */
     public Car(int lane, int position, int logLength) {
         this.lane = lane;
         this.position = position;
-        this.traveledDistance = 0;
-        this.speedLog = new int[logLength];
+        traveledDistance = 0;
+        if (logLength > 0)
+            speedLog = new int[logLength];
+        else // if the simulation runs forever, don't reserve an array (no statistics)
+            speedLog = null;
     }
 
     /**
@@ -76,45 +82,42 @@ public abstract class Car {
      * @return true if a move was possible for the car.
      */
     public boolean move(int[] l1, int[] l2) {
-
+        // save data for statistics
         this.traveledDistance += speed;
-        if (numIterations < speedLog.length) {
+        if (speedLog != null && numIterations < speedLog.length) {
             speedLog[numIterations] = speed;
             numIterations++;
         }
         maxReachedSpeed = maxReachedSpeed < speed ? speed : maxReachedSpeed;
 
-        //If global max speed holds, stick to that. Otherwise, do as you do.
-        int desiredPosition, limit,minimumPosition;
-        if (TrafficSimulation.GLOBAL_SPEED_RULE) {
+        // if global max speed holds, stick to that. Otherwise, do as you do.
+        int desiredPosition, limit, minimumPosition;
+        if (TrafficSimulation.GLOBAL_SPEED_RULE && TrafficSimulation.CAR_IS_CURRENTLY_BROKEN) {
             limit = Math.min(TrafficSimulation.GLOBAL_MAX_SPEED, maximumSpeed);
         } else {
             limit = maximumSpeed;
         }
 
+        // calculate the furthest and closest next position of the car based on its physical cababilities
         desiredPosition = speed + maximumAcceleration < limit ? position + speed + maximumAcceleration : position + limit;
-
         minimumPosition = speed - maximumDeceleration > 0 ? position + speed - maximumDeceleration : position;
 
         // retrieve neighborhood info (position and speed of the 3 important neighbors)
         int nextCarSameLpos = getPositionOfNextCar(lane == 1 ? l1 : l2, position);
         int nextCarDiffLpos = getPositionOfNextCar(lane == 1 ? l2 : l1, position);
         int prevCarDiffLpos = getPositionOfPrevCar(lane == 1 ? l2 : l1, position);
-        if (prevCarDiffLpos != -1) {
-            int prevCarDiffLspeed = lane == 1 ? l2[prevCarDiffLpos] : l1[prevCarDiffLpos];
-        }
 
+        // randomly add deceleration (or decrease in acceleration) to make the system non-deterministic
+        Random r = new Random();
+        if (lane == 1 && r.nextDouble() < 0.05) {
+            desiredPosition--;
+        }
+        if (lane == 2 && r.nextDouble() < 0.5) {
+            desiredPosition--;
+        }
         int nextCarSameLspeed, nextCarDiffLspeed, nextSpeed;
 
-        Random r = new Random();
-        if (lane == 1 && r.nextDouble() < 0.5) {
-            desiredPosition--;
-        }
-        if (lane == 2 && r.nextDouble() < 0.05) {
-            desiredPosition--;
-        }
-
-        // iterate through all possible positions (starting from the most desired)
+        // iterate through all possible positions starting from the most desired one
         for (int nextPosition = desiredPosition; nextPosition >= minimumPosition; nextPosition--) { //nextPosition is not rounded to road size yet
             nextSpeed = nextPosition - position;
 
@@ -172,10 +175,6 @@ public abstract class Car {
         // calculate the number of cells required for the car behind to come to full stop (and add 1 extra cell)
         minFutureGap = moves * futurePrevCarSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;  // ((moves - 1) * moves) / 2 is 1+2+...+k = k*(k+1)/2 where k = moves-1
 
-        // Hue - test reserved gap
-//        minFutureGap = 0;
-//        if (futurePrevCarSpeed>nextPosition-position)
-//            minFutureGap = moves * (futurePrevCarSpeed-nextPosition-position);        
         // minFutureGap is the minimum allowed gap. worstCaseGap is actual gap between the two cars, if *this* car performs the eximined move.
         if (prevCarPos > position) //comes full circle
         {
@@ -217,10 +216,6 @@ public abstract class Car {
         // calculate the number of cells required for the car infront to come to full stop
         minFutureGap = moves * nextSpeed - ((moves - 1) * moves) / 2 * maximumDeceleration + 1;
 
-        // Hue - test reserved gap
-//        minFutureGap = 0;
-//        if (nextCarSpeed-TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION  < nextSpeed)
-//            minFutureGap = moves * (nextSpeed - nextCarSpeed + TrafficSimulation.GLOBAL_MAXIMUM_DECELERATION);
         // minFutureGap is the minimum allowed gap. worstCaseGap is actual gap between the two cars, if *this* car performs the eximined move.
         if (nextCarPos < position) //comes full circle
         {
@@ -276,6 +271,7 @@ public abstract class Car {
      */
     public void clearTraveledDistance() {
         traveledDistance = 0;
+        numIterations = 0;
     }
 
     public int getTraveledDistance() {
@@ -298,7 +294,7 @@ public abstract class Car {
         return color;
     }
 
-    public int getMaxSpeed() {
+    public int getMaxReachedSpeed() {
         return maxReachedSpeed;
     }
 
@@ -306,10 +302,15 @@ public abstract class Car {
         return traveledDistance;
     }
 
+    /**
+     * Returns the type of the car
+     * @return "S" if the car is Slow, "F" if the car is Fast, "E" for anything
+     * Else.
+     */
     public String getType() {
         switch (this.getClass().toString()) {
             case "class trafficsimulation.SlowCar":
-                return "N";
+                return "S";
             case "class trafficsimulation.FastCar":
                 return "F";
         }
